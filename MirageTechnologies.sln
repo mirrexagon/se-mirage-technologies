@@ -3,15 +3,21 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MirageTechnologies", "MirageTechnologies\MirageTechnologies.csproj", "{A664F389-8ECE-41A7-AA8B-5001C70F28F2}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ship", "Mixins\Ship\Ship.shproj", "{A30AE17F-0D1C-4C01-AF5B-A0976A165630}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShipTest", "Scripts\ShipTest\ShipTest.csproj", "{F5200C48-083C-4620-B7A0-EE3138C8A424}"
 EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Mixins\Ship\Ship.projitems*{a30ae17f-0d1c-4c01-af5b-a0976a165630}*SharedItemsImports = 13
+		Mixins\Ship\Ship.projitems*{f5200c48-083c-4620-b7a0-ee3138c8a424}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A664F389-8ECE-41A7-AA8B-5001C70F28F2}.Debug|x64.ActiveCfg = Debug|x64
-		{A664F389-8ECE-41A7-AA8B-5001C70F28F2}.Debug|x64.Build.0 = Debug|x64
+		{F5200C48-083C-4620-B7A0-EE3138C8A424}.Debug|x64.ActiveCfg = Debug|x64
+		{F5200C48-083C-4620-B7A0-EE3138C8A424}.Debug|x64.Build.0 = Debug|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
