@@ -19,21 +19,21 @@ using VRageMath;
 
 namespace IngameScript {
     partial class Program {
-        public class Gyros {
+        public class Rotation {
             Program program;
             IMyTerminalBlock orientationReference;
 
-            IMyTextPanel panel;
+            IMyTextPanel debugPanel;
 
             List<IMyGyro> gyroBlocks;
 
-            public Gyros(Program program, IMyTerminalBlock orientationReference) {
+            public Rotation(Program program, IMyTerminalBlock orientationReference) {
                 this.program = program;
                 this.orientationReference = orientationReference;
 
                 List<IMyTextPanel> panels = new List<IMyTextPanel>();
                 program.GridTerminalSystem.GetBlocksOfType(panels);
-                panel = panels[0];
+                debugPanel = panels[0];
 
                 ReloadBlockReferences();
             }
@@ -52,7 +52,7 @@ namespace IngameScript {
                     msg += $"{gyroWorldOrientation.Forward}";
                 }
 
-                panel.WritePublicText(msg);
+                debugPanel.WritePublicText(msg);
             }
 
             public void ReloadBlockReferences() {

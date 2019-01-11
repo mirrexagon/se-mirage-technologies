@@ -26,17 +26,16 @@ namespace IngameScript {
 
             IMyTerminalBlock orientationReference;
 
-            Gyros gyros;
+            Rotation Rotation;
 
             public Ship(Program program) {
                 this.program = program;
                 orientationReference = FindOrientationReference();
-                gyros = new Gyros(program, orientationReference);
+                Rotation = new Rotation(program, orientationReference);
             }
 
             public void Update(double dt) {
-                program.Echo($"Orientation reference: {orientationReference.CustomName}");
-                gyros.Update(dt);
+                Rotation.Update(dt);
             }
 
             IMyTerminalBlock FindOrientationReference() {
