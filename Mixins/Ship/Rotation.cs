@@ -17,55 +17,83 @@ using VRageMath;
 
 // The front of a gyro is the bit that points downwards.
 
+// With "Show grid pivot" on, the red line points right/X+, the green line points up/Y+, the blue line points forward/Z-
+
+// A block's Orientation.GetMatrix() method returns a matrix that transforms
+// from the block's orientation to the parent grid's orientation. We need the inverse.
+// The inverse of a pure rotation matrix is just its transpose.
+// https://forum.keenswh.com/threads/comparing-block-orientations.7376017/#post-1286903026
+
+// https://forum.keenswh.com/threads/programmable-block-imythrust-gridthrustdirection-issue.7399243/
+// https://github.com/Wicorel/WicoSpaceEngineers/blob/master/WicoThrusters/WicoThrusters/thrusters.cs#L88
+
+// Vector.Transform() premultiplies (as opposed to post multiplying) the vector:
+// https://forum.keenswh.com/threads/script-to-maintain-a-specific-alignment.7324214/#post-1286570090
+
+// Gyros:
+// Pitch property positive -> terminal pitch negative -> clockwise rotation when looking from positive X (right)
+// Yaw property positive -> terminal yaw positive -> anticlockwise rotation when looking from positive Y (up)
+// Roll property positive -> terminal roll positive -> clockwise rotation when looking from positive Z (back)
+
 namespace IngameScript {
     partial class Program {
         public class Rotation {
             Program program;
+
             IMyTerminalBlock orientationReference;
-
-            IMyTextPanel debugPanel;
-
             List<IMyGyro> gyroBlocks;
+
+            // Target world orientation of the orientation reference.
+            public QuaternionD targetOrientation = QuaternionD.Identity;
 
             public Rotation(Program program, IMyTerminalBlock orientationReference) {
                 this.program = program;
                 this.orientationReference = orientationReference;
 
-                List<IMyTextPanel> panels = new List<IMyTextPanel>();
-                program.GridTerminalSystem.GetBlocksOfType(panels);
-                debugPanel = panels[0];
-
                 ReloadBlockReferences();
             }
 
             public void Update(double dt) {
-                ReloadBlockReferences();
-                string msg = "";
+                UpdateOrientation(dt);
+            }
 
-                MatrixD referenceWorldOrientation = orientationReference.WorldMatrix.GetOrientation();
-                MatrixD gridWorldOrientation = program.Me.CubeGrid.WorldMatrix.GetOrientation();
+            void UpdateOrientation(double dt) {
+                QuaternionD orientationError = targetOrientation / GetWorldOrientationOfReference();
 
-                msg += $"{gridWorldOrientation.Forward}\n";
+                Vector3D worldRotationAxis;
+                double worldRotationAngle;
+                orientationError.GetAxisAngle(out worldRotationAxis, out worldRotationAngle);
 
-                if (gyroBlocks.Count > 0) {
-                    MatrixD gyroWorldOrientation = gyroBlocks[0].WorldMatrix.GetOrientation();
-                    msg += $"{gyroWorldOrientation.Forward}";
+                foreach (IMyGyro gyro in gyroBlocks) {
+                    // https://forum.keenswh.com/threads/how-can-i-roll-my-ship-to-align-its-floor-with-the-floor-of-a-station.7382390/#post-1286963408
+                    MatrixD worldToGyro = MatrixD.Invert(gyro.WorldMatrix.GetOrientation());
+                    Vector3D localRotationAxis = Vector3D.Transform(worldRotationAxis, worldToGyro);
+                    
+                    double value = Math.Log(worldRotationAngle + 1, 2);
+                    localRotationAxis *= value < 0.001 ? 0 : value;
+                    gyro.Pitch = (float)-localRotationAxis.X;
+                    gyro.Yaw = (float)-localRotationAxis.Y;
+                    gyro.Roll = (float)-localRotationAxis.Z;
                 }
-
-                debugPanel.WritePublicText(msg);
             }
 
             public void ReloadBlockReferences() {
                 gyroBlocks = new List<IMyGyro>();
                 program.GridTerminalSystem.GetBlocksOfType(gyroBlocks, b => b.CubeGrid == program.Me.CubeGrid);
             }
-            
-            Quaternion GetWorldOrientationOfReference() {
-                return Quaternion.CreateFromRotationMatrix(orientationReference.WorldMatrix.GetOrientation());
+
+            public void SetGyroOverrideEnabled(bool enabled) {
+                foreach (IMyGyro gyro in gyroBlocks) {
+                    gyro.GyroOverride = enabled;
+                }
             }
 
-            Quaternion GetWorldOrientationOfGrid() {
-                return Quaternion.CreateFromRotationMatrix(program.Me.CubeGrid.WorldMatrix.GetOrientation());
+            QuaternionD GetWorldOrientationOfReference() {
+                return QuaternionD.CreateFromRotationMatrix(orientationReference.WorldMatrix.GetOrientation());
+            }
+
+            QuaternionD GetWorldOrientationOfGrid() {
+                return QuaternionD.CreateFromRotationMatrix(program.Me.CubeGrid.WorldMatrix.GetOrientation());
             }
         }
     }

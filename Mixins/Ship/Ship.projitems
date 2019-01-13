@@ -9,7 +9,7 @@
     <Import_RootNamespace>Ship</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Gyros.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rotation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Ship.cs" />
   </ItemGroup>
 </Project>

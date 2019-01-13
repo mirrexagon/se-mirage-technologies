@@ -36,7 +36,14 @@ namespace IngameScript {
                 }
 
                 if ((updateSource & (UpdateType.Trigger | UpdateType.Terminal)) != 0) {
+                    ship.rotation.SetGyroOverrideEnabled(true);
 
+                    string[] args = argument.Split(',');
+
+                    double targetYaw = double.Parse(args[0]);
+                    double targetPitch = double.Parse(args[1]);
+
+                    ship.rotation.targetOrientation = QuaternionD.CreateFromYawPitchRoll(targetYaw, targetPitch, 0);
                 }
 
                 if ((updateSource & UpdateType.Update10) != 0) {

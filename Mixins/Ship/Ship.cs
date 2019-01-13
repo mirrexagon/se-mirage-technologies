@@ -26,16 +26,16 @@ namespace IngameScript {
 
             IMyTerminalBlock orientationReference;
 
-            Rotation Rotation;
+            public Rotation rotation;
 
             public Ship(Program program) {
                 this.program = program;
                 orientationReference = FindOrientationReference();
-                Rotation = new Rotation(program, orientationReference);
+                rotation = new Rotation(program, orientationReference);
             }
 
             public void Update(double dt) {
-                Rotation.Update(dt);
+                rotation.Update(dt);
             }
 
             IMyTerminalBlock FindOrientationReference() {
