@@ -22,8 +22,6 @@ namespace IngameScript {
         public Program() {
             ship = new Ship(this);
             Runtime.UpdateFrequency = UpdateFrequency.Update10;
-
-            ship.translation.targetPosition = ship.translation.GetWorldPosition();
         }
 
         public void Save() {
@@ -41,7 +39,7 @@ namespace IngameScript {
                 ship.SetInertialDampenersEnabled(false);
 
                 if ((updateSource & (UpdateType.Trigger | UpdateType.Terminal)) != 0) {
-                    ship.translation.targetPosition = new Vector3D(0, double.Parse(argument), 0);
+                    ship.translation.targetVelocity = new Vector3D(0, 0, double.Parse(argument));
                 }
 
                 if ((updateSource & UpdateType.Update10) != 0) {

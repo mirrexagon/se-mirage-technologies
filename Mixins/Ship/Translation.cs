@@ -15,7 +15,7 @@ using VRage.Game.ObjectBuilders.Definitions;
 using VRage.Game;
 using VRageMath;
 
-// TODO: Calculating stopping distance and using that to just go up to cruise speed, then slow down in time.
+// TODO: Use known max thrust to stop sliding while accelerating when one side is more powerful than the other.
 
 namespace IngameScript {
     partial class Program {
@@ -36,16 +36,11 @@ namespace IngameScript {
             Dictionary<Base6Directions.Direction, double> maximumThrust;
 
             public Vector3D targetVelocity = new Vector3D(0, 0, 0);
-            public Vector3D targetPosition = new Vector3D(0, 0, 0);
-            public double cruiseSpeed = 100.0; // m/s
+            readonly double velocitySmoothingLimit = 4;
 
             // Velocity calculation.
             Vector3D lastPosition;
             Vector3D lastVelocity; // position units per second.
-
-            // PID control.
-            Dictionary<Base6Directions.Axis, PID> velocityPIDs;
-            Dictionary<Base6Directions.Axis, PID> positionPIDs;
 
             // Transformations.
             MatrixD rotateWorldToOrientationReference;
@@ -55,73 +50,36 @@ namespace IngameScript {
                 this.orientationReference = orientationReference;
                 rotateWorldToOrientationReference = MatrixD.Transpose(orientationReference.WorldMatrix.GetOrientation());
 
-                velocityPIDs = new Dictionary<Base6Directions.Axis, PID>();
-                velocityPIDs.Add(Base6Directions.Axis.LeftRight, 
-                        new PID(0.8, 0, 0, 10));
-                velocityPIDs.Add(Base6Directions.Axis.UpDown, 
-                        new PID(0.8, 0, 0, 10));
-                velocityPIDs.Add(Base6Directions.Axis.ForwardBackward, 
-                        new PID(0.8, 0, 0, 10));
-
-                positionPIDs = new Dictionary<Base6Directions.Axis, PID>();
-                positionPIDs.Add(Base6Directions.Axis.LeftRight,
-                        new PID(2, 0, 0.2, 10));
-                positionPIDs.Add(Base6Directions.Axis.UpDown,
-                        new PID(2, 0, 0.2, 10));
-                positionPIDs.Add(Base6Directions.Axis.ForwardBackward,
-                        new PID(2, 0, 0.2, 10));
-
 
                 ReloadBlockReferences();
             }
 
             public void Update(double dt) {
                 UpdateVelocity(dt);
-
-                UpdatePositionControl(dt);
                 UpdateVelocityControl(dt);
-
-                program.Echo($"Position: {GetWorldPosition()}");
-                program.Echo($"Velocity: {GetWorldVelocity()}");
-            }
-
-            void UpdatePositionControl(double dt) {
-                Vector3D positionError = targetPosition - GetWorldPosition();
-                Vector3D responseVelocity = new Vector3D();
-
-                program.Echo($"Position error: {positionError}");
-
-                responseVelocity.X = positionPIDs[Base6Directions.Axis.LeftRight].Update(positionError.X, dt);
-                responseVelocity.Y = positionPIDs[Base6Directions.Axis.UpDown].Update(positionError.Y, dt);
-                responseVelocity.Z = positionPIDs[Base6Directions.Axis.ForwardBackward].Update(positionError.Z, dt);
-
-                program.Echo($"Response velocity: {responseVelocity}");
-
-                double responseSpeed = responseVelocity.Length();
-                if (responseSpeed > cruiseSpeed) {
-                    responseVelocity *= cruiseSpeed / responseSpeed;
-                }
-
-                program.Echo($"Capped response velocity: {responseVelocity}");
-
-                targetVelocity = responseVelocity;
             }
 
             void UpdateVelocityControl(double dt) {
                 Vector3D velocityError = targetVelocity - GetWorldVelocity();
-                program.Echo($"Velocity error: {velocityError}");
+                program.Echo($"Velocity error: {velocityError.Length()}");
 
-                Vector3D localVelocityError = Vector3D.Transform(velocityError, rotateWorldToOrientationReference);
+                if (velocityError.LengthSquared() > 0) {
+                    Vector3D localVelocityErrorDirection = Vector3D.Transform(velocityError, rotateWorldToOrientationReference);
+                    double speedError = localVelocityErrorDirection.Normalize();
 
-                Vector3D responseThrust = new Vector3D();
+                    Vector3D responseThrust;
+                    if (speedError < velocitySmoothingLimit) {
+                        double response = speedError / velocitySmoothingLimit;
+                        program.Echo($"Response amount: {response}");
+                        responseThrust = localVelocityErrorDirection * response;
+                    } else {
+                        responseThrust = localVelocityErrorDirection;
+                    }
 
-                responseThrust.X = velocityPIDs[Base6Directions.Axis.LeftRight].Update(velocityError.X, dt);
-                responseThrust.Y = velocityPIDs[Base6Directions.Axis.UpDown].Update(velocityError.Y, dt);
-                responseThrust.Z = velocityPIDs[Base6Directions.Axis.ForwardBackward].Update(velocityError.Z, dt);
+                    program.Echo($"Response thrust: {responseThrust.Length()}");
 
-                program.Echo($"Response velocity: {responseThrust}");
-
-                SetThrust(responseThrust);
+                    SetThrust(responseThrust);
+                }
             }
 
             // We accelerate in the specified direction.
