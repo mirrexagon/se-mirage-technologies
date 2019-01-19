@@ -7,10 +7,14 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ship", "Mixins\Ship\Ship.sh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShipTest", "Scripts\ShipTest\ShipTest.csproj", "{F5200C48-083C-4620-B7A0-EE3138C8A424}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Utilities", "Utilities\Utilities.shproj", "{F15FACF1-E571-499A-96CB-1CE13C599E2E}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Mixins\Ship\Ship.projitems*{a30ae17f-0d1c-4c01-af5b-a0976a165630}*SharedItemsImports = 13
+		Utilities\Utilities.projitems*{f15facf1-e571-499a-96cb-1ce13c599e2e}*SharedItemsImports = 13
 		Mixins\Ship\Ship.projitems*{f5200c48-083c-4620-b7a0-ee3138c8a424}*SharedItemsImports = 4
+		Utilities\Utilities.projitems*{f5200c48-083c-4620-b7a0-ee3138c8a424}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64

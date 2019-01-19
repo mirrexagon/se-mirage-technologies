@@ -37,43 +37,10 @@ namespace IngameScript {
 
                 if ((updateSource & (UpdateType.Trigger | UpdateType.Terminal)) != 0) {
                     ship.rotation.SetGyroOverrideEnabled(true);
+                    ship.rotation.targetOrientation = QuaternionD.Identity;
 
-                    Vector3D axis;
-                    double angle = Math.PI / 2;
-
-                    switch (argument) {
-                        case "0":
-                            axis = new Vector3D(1, 0, 0);
-                            angle = Math.PI / 2;
-                            break;
-                        case "1":
-                            axis = new Vector3D(1, 0, 0);
-                            angle = -Math.PI / 2;
-                            break;
-                        case "2":
-                            axis = new Vector3D(0, 1, 0);
-                            angle = Math.PI / 2;
-                            break;
-                        case "3":
-                            axis = new Vector3D(0, 1, 0);
-                            angle = -Math.PI / 2;
-                            break;
-                        case "4":
-                            axis = new Vector3D(0, 0, 1);
-                            angle = Math.PI / 2;
-                            break;
-                        case "5":
-                            axis = new Vector3D(0, 0, 1);
-                            angle = -Math.PI / 2;
-                            break;
-                        default:
-                            axis = new Vector3D(1, 0, 0);
-                            angle = 0;
-                            break;
-
-                    }
-
-                    ship.rotation.targetOrientation = QuaternionD.CreateFromAxisAngle(axis, angle);
+                    ship.SetInertialDampenersEnabled(false);
+                    ship.translation.targetVelocity = new Vector3D(0, 0, 0);
                 }
 
                 if ((updateSource & UpdateType.Update10) != 0) {

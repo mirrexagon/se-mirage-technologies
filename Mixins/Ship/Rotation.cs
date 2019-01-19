@@ -69,8 +69,10 @@ namespace IngameScript {
                     MatrixD worldToGyro = MatrixD.Invert(gyro.WorldMatrix.GetOrientation());
                     Vector3D localRotationAxis = Vector3D.Transform(worldRotationAxis, worldToGyro);
                     
+                    // Smoothing when close to target.
                     double value = Math.Log(worldRotationAngle + 1, 2);
                     localRotationAxis *= value < 0.001 ? 0 : value;
+
                     gyro.Pitch = (float)-localRotationAxis.X;
                     gyro.Yaw = (float)-localRotationAxis.Y;
                     gyro.Roll = (float)-localRotationAxis.Z;

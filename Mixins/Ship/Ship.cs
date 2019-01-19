@@ -38,6 +38,13 @@ namespace IngameScript {
 
             public void Update(double dt) {
                 rotation.Update(dt);
+                translation.Update(dt);
+            }
+
+            public void SetInertialDampenersEnabled(bool enabled) {
+                foreach (IMyShipController shipController in shipControllers) {
+                    shipController.DampenersOverride = enabled;
+                }
             }
 
             public void ReloadBlockReferences() {

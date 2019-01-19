@@ -40,9 +40,13 @@ namespace IngameScript {
             Vector3D lastPosition;
             Vector3D lastVelocity; // position units per second.
 
+            // Transformations.
+            MatrixD rotateWorldToOrientationReference;
+
             public Translation(Program program, IMyTerminalBlock orientationReference) {
                 this.program = program;
                 this.orientationReference = orientationReference;
+                rotateWorldToOrientationReference = MatrixD.Transpose(orientationReference.WorldMatrix.GetOrientation());
 
                 ReloadBlockReferences();
             }
@@ -55,10 +59,39 @@ namespace IngameScript {
             void UpdateVelocityControl(double dt) {
                 Vector3D velocityError = targetVelocity - GetWorldVelocity();
 
+                Vector3D thrusterPower = velocityError;
 
+                // Smoothing when close to target.
+                for (int dim = 0; dim < 3; ++dim) {
+                    double power = thrusterPower.GetDim(dim);
+                    power = power < 0.0001 ? 0 : power;
+                    thrusterPower.SetDim(dim, power);
+                }
+
+                program.Echo($"{thrusterPower}");
+
+                Vector3D localThrusterPower = Vector3D.Transform(thrusterPower, rotateWorldToOrientationReference);
+                SetThrust(thrusterPower);
             }
 
             // We accelerate in the specified direction.
+            // Each dimension of power is a number in [-1, 1].
+            void SetThrust(Vector3D power) {
+                double leftPower = (power.X < 0) ? -power.X : 0; // -X
+                double rightPower = (power.X >= 0) ? power.X : 0; // +X
+                double downPower = (power.Y < 0) ? -power.Y : 0; // -Y
+                double upPower = (power.Y >= 0) ? power.Y : 0; // +Y
+                double forwardPower = (power.Z < 0) ? -power.Z : 0; // -Z
+                double backwardPower = (power.Z >= 0) ? power.Z : 0; // +Z
+
+                SetThrustInDirection(Base6Directions.Direction.Left, leftPower);
+                SetThrustInDirection(Base6Directions.Direction.Right, rightPower);
+                SetThrustInDirection(Base6Directions.Direction.Down, downPower);
+                SetThrustInDirection(Base6Directions.Direction.Up, upPower);
+                SetThrustInDirection(Base6Directions.Direction.Forward, forwardPower);
+                SetThrustInDirection(Base6Directions.Direction.Backward, backwardPower);
+            }
+
             void SetThrustInDirection(Base6Directions.Direction direction, double power) {
                 foreach (IMyThrust thruster in thrusters[direction]) {
                     thruster.ThrustOverridePercentage = (float)power;
@@ -67,6 +100,7 @@ namespace IngameScript {
 
             public void ReloadBlockReferences() {
                 thrusters = new Dictionary<Base6Directions.Direction, List<IMyThrust>>();
+                maximumThrust = new Dictionary<Base6Directions.Direction, double>();
                 foreach (Base6Directions.Direction direction in BASE6DIRECTIONS) {
                     thrusters.Add(direction, new List<IMyThrust>());
                     maximumThrust.Add(direction, 0);
