@@ -22,6 +22,8 @@ namespace IngameScript {
         public Program() {
             ship = new Ship(this);
             Runtime.UpdateFrequency = UpdateFrequency.Update10;
+
+            ship.translation.targetPosition = ship.translation.GetWorldPosition();
         }
 
         public void Save() {
@@ -35,12 +37,11 @@ namespace IngameScript {
                     dt = 0.01;
                 }
 
-                if ((updateSource & (UpdateType.Trigger | UpdateType.Terminal)) != 0) {
-                    ship.rotation.SetGyroOverrideEnabled(true);
-                    ship.rotation.targetOrientation = QuaternionD.Identity;
+                ship.rotation.SetGyroOverrideEnabled(true);
+                ship.SetInertialDampenersEnabled(false);
 
-                    ship.SetInertialDampenersEnabled(false);
-                    ship.translation.targetVelocity = new Vector3D(0, 0, 0);
+                if ((updateSource & (UpdateType.Trigger | UpdateType.Terminal)) != 0) {
+                    ship.translation.targetPosition = new Vector3D(0, double.Parse(argument), 0);
                 }
 
                 if ((updateSource & UpdateType.Update10) != 0) {
