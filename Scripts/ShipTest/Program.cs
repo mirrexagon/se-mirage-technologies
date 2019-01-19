@@ -40,15 +40,15 @@ namespace IngameScript {
 
                     if (argument == "pitch") {
                         Vector3D axis = new Vector3D(1, 0, 0);
-                        double angle = Math.PI / 3;
+                        double angle = -Math.PI / 3;
                         ship.rotation.targetOrientation = QuaternionD.CreateFromAxisAngle(axis, angle);
                     } else if (argument == "yaw") {
                         Vector3D axis = new Vector3D(0, 1, 0);
-                        double angle = Math.PI / 3;
+                        double angle = -Math.PI / 3;
                         ship.rotation.targetOrientation = QuaternionD.CreateFromAxisAngle(axis, angle);
                     }  else if (argument == "roll") {
                         Vector3D axis = new Vector3D(0, 0, 1);
-                        double angle = Math.PI / 3;
+                        double angle = -Math.PI / 3;
                         ship.rotation.targetOrientation = QuaternionD.CreateFromAxisAngle(axis, angle);
                     } else {
                         ship.rotation.targetOrientation = QuaternionD.Identity;

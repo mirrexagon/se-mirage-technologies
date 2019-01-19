@@ -58,7 +58,7 @@ namespace IngameScript {
             }
 
             void UpdateOrientation(double dt) {
-                QuaternionD orientationError = targetOrientation / GetWorldOrientationOfReference();
+                QuaternionD orientationError = targetOrientation / GetWorldOrientation();
 
                 Vector3D worldRotationAxis;
                 double worldRotationAngle;
@@ -88,12 +88,8 @@ namespace IngameScript {
                 }
             }
 
-            QuaternionD GetWorldOrientationOfReference() {
+            public QuaternionD GetWorldOrientation() {
                 return QuaternionD.CreateFromRotationMatrix(orientationReference.WorldMatrix.GetOrientation());
-            }
-
-            QuaternionD GetWorldOrientationOfGrid() {
-                return QuaternionD.CreateFromRotationMatrix(program.Me.CubeGrid.WorldMatrix.GetOrientation());
             }
         }
     }
