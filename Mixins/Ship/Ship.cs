@@ -27,15 +27,23 @@ namespace IngameScript {
             IMyTerminalBlock orientationReference;
 
             public Rotation rotation;
+            public Translation translation;
 
             public Ship(Program program) {
                 this.program = program;
                 orientationReference = FindOrientationReference();
                 rotation = new Rotation(program, orientationReference);
+                translation = new Translation(program, orientationReference);
             }
 
             public void Update(double dt) {
                 rotation.Update(dt);
+            }
+
+            public void ReloadBlockReferences() {
+                ReloadShipControllerReferences();
+                rotation.ReloadBlockReferences();
+                translation.ReloadBlockReferences();
             }
 
             IMyTerminalBlock FindOrientationReference() {

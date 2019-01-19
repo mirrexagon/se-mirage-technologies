@@ -38,23 +38,42 @@ namespace IngameScript {
                 if ((updateSource & (UpdateType.Trigger | UpdateType.Terminal)) != 0) {
                     ship.rotation.SetGyroOverrideEnabled(true);
 
-                    if (argument == "pitch") {
-                        Vector3D axis = new Vector3D(1, 0, 0);
-                        double angle = -Math.PI / 3;
-                        ship.rotation.targetOrientation = QuaternionD.CreateFromAxisAngle(axis, angle);
-                    } else if (argument == "yaw") {
-                        Vector3D axis = new Vector3D(0, 1, 0);
-                        double angle = -Math.PI / 3;
-                        ship.rotation.targetOrientation = QuaternionD.CreateFromAxisAngle(axis, angle);
-                    }  else if (argument == "roll") {
-                        Vector3D axis = new Vector3D(0, 0, 1);
-                        double angle = -Math.PI / 3;
-                        ship.rotation.targetOrientation = QuaternionD.CreateFromAxisAngle(axis, angle);
-                    } else {
-                        ship.rotation.targetOrientation = QuaternionD.Identity;
+                    Vector3D axis;
+                    double angle = Math.PI / 2;
+
+                    switch (argument) {
+                        case "0":
+                            axis = new Vector3D(1, 0, 0);
+                            angle = Math.PI / 2;
+                            break;
+                        case "1":
+                            axis = new Vector3D(1, 0, 0);
+                            angle = -Math.PI / 2;
+                            break;
+                        case "2":
+                            axis = new Vector3D(0, 1, 0);
+                            angle = Math.PI / 2;
+                            break;
+                        case "3":
+                            axis = new Vector3D(0, 1, 0);
+                            angle = -Math.PI / 2;
+                            break;
+                        case "4":
+                            axis = new Vector3D(0, 0, 1);
+                            angle = Math.PI / 2;
+                            break;
+                        case "5":
+                            axis = new Vector3D(0, 0, 1);
+                            angle = -Math.PI / 2;
+                            break;
+                        default:
+                            axis = new Vector3D(1, 0, 0);
+                            angle = 0;
+                            break;
+
                     }
 
-                    
+                    ship.rotation.targetOrientation = QuaternionD.CreateFromAxisAngle(axis, angle);
                 }
 
                 if ((updateSource & UpdateType.Update10) != 0) {

@@ -54,10 +54,10 @@ namespace IngameScript {
             }
 
             public void Update(double dt) {
-                UpdateOrientation(dt);
+                UpdateOrientationControl(dt);
             }
 
-            void UpdateOrientation(double dt) {
+            void UpdateOrientationControl(double dt) {
                 QuaternionD orientationError = targetOrientation / GetWorldOrientation();
 
                 Vector3D worldRotationAxis;
