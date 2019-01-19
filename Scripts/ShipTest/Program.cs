@@ -38,12 +38,23 @@ namespace IngameScript {
                 if ((updateSource & (UpdateType.Trigger | UpdateType.Terminal)) != 0) {
                     ship.rotation.SetGyroOverrideEnabled(true);
 
-                    string[] args = argument.Split(',');
+                    if (argument == "pitch") {
+                        Vector3D axis = new Vector3D(1, 0, 0);
+                        double angle = Math.PI / 3;
+                        ship.rotation.targetOrientation = QuaternionD.CreateFromAxisAngle(axis, angle);
+                    } else if (argument == "yaw") {
+                        Vector3D axis = new Vector3D(0, 1, 0);
+                        double angle = Math.PI / 3;
+                        ship.rotation.targetOrientation = QuaternionD.CreateFromAxisAngle(axis, angle);
+                    }  else if (argument == "roll") {
+                        Vector3D axis = new Vector3D(0, 0, 1);
+                        double angle = Math.PI / 3;
+                        ship.rotation.targetOrientation = QuaternionD.CreateFromAxisAngle(axis, angle);
+                    } else {
+                        ship.rotation.targetOrientation = QuaternionD.Identity;
+                    }
 
-                    double targetYaw = double.Parse(args[0]);
-                    double targetPitch = double.Parse(args[1]);
-
-                    ship.rotation.targetOrientation = QuaternionD.CreateFromYawPitchRoll(targetYaw, targetPitch, 0);
+                    
                 }
 
                 if ((updateSource & UpdateType.Update10) != 0) {
