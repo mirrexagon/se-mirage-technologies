@@ -18,7 +18,7 @@ using VRageMath;
 namespace IngameScript {
     partial class Program {
         partial class Ship {
-            public Vector3D TargetVelocity { get; set; } = new Vector3D(0, 0, 0);
+            public Vector3D TargetVelocity { get; set; }
             readonly double velocitySmoothingLimit = 4;
 
             // All thruster blocks in the ship, categorized by the direction
@@ -36,16 +36,8 @@ namespace IngameScript {
             double maxPossibleThrustInAnyDirection;
             Base6Directions.Direction maxThrustDirection;
 
-            public Vector3D GetWorldPosition() {
-                return orientationReference.CenterOfMass;
-            }
-
-            public Vector3D GetWorldVelocity() {
-                return lastVelocity;
-            }
-
             void UpdateVelocityControl(double dt) {
-                Vector3D velocityError = TargetVelocity - GetWorldVelocity();
+                Vector3D velocityError = GetVelocityError();
 
                 double speedError = velocityError.Normalize();
                 Vector3D velocityErrorDirection = velocityError;
@@ -67,6 +59,18 @@ namespace IngameScript {
 
                     SetThrust(responseThrust * maxPossibleThrustInAnyDirection * 2);
                 }
+            }
+
+            public Vector3D GetWorldPosition() {
+                return orientationReference.CenterOfMass;
+            }
+
+            public Vector3D GetWorldVelocity() {
+                return lastVelocity;
+            }
+
+            public Vector3D GetVelocityError() {
+                return TargetVelocity - GetWorldVelocity();
             }
 
             // Thrust is capped so that we always accelerate in a straight line,

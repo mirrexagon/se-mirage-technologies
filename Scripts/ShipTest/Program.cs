@@ -17,10 +17,10 @@ using VRageMath;
 
 namespace IngameScript {
     partial class Program : MyGridProgram {
-        private Ship ship;
+        NavigationSystem navsys;
 
         public Program() {
-            ship = new Ship(this);
+            navsys = new NavigationSystem(this);
             Runtime.UpdateFrequency = UpdateFrequency.Update10;
         }
 
@@ -30,23 +30,25 @@ namespace IngameScript {
 
         public void Main(string argument, UpdateType updateSource) {
             try {
+                ClearLog();
+
                 double dt = Runtime.TimeSinceLastRun.TotalSeconds;
                 if (dt == 0) {
                     dt = 0.01;
                 }
 
-                ship.SetGyroOverrideEnabled(true);
-                ship.SetInertialDampenersEnabled(false);
-
                 if ((updateSource & (UpdateType.Trigger | UpdateType.Terminal)) != 0) {
-                    ship.TargetVelocity = new Vector3D(0, 0, double.Parse(argument));
+                    GPSLocation location = GPSLocation.FromString(argument);
+                    if (location != null) {
+                        navsys.SetTargetPosition(location.position);
+                    }
                 }
 
                 if ((updateSource & UpdateType.Update10) != 0) {
-
+                    navsys.Update(dt);
                 }
 
-                ship.Update(dt);
+                Log($"Current target position: {navsys.targetPosition}");
             } catch (Exception e) {
                 Echo("An error occurred during script execution.");
                 Echo($"Exception: {e}\n---");

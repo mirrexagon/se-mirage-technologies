@@ -19,7 +19,7 @@ namespace IngameScript {
     partial class Program {
         partial class Ship {
             // Target world orientation of the orientation reference.
-            public QuaternionD TargetOrientation { get; set; } = QuaternionD.Identity;
+            public QuaternionD TargetOrientation { get; set; }
 
             // All gyros on the ship.
             List<IMyGyro> gyros;
@@ -35,7 +35,7 @@ namespace IngameScript {
             }
 
             void UpdateOrientationControl(double dt) {
-                QuaternionD orientationError = TargetOrientation / GetWorldOrientation();
+                QuaternionD orientationError = GetOrientationError();
 
                 Vector3D worldRotationAxis;
                 double worldRotationAngle;
@@ -54,6 +54,10 @@ namespace IngameScript {
                     gyro.Yaw = (float)-localRotationAxis.Y;
                     gyro.Roll = (float)-localRotationAxis.Z;
                 }
+            }
+
+            public QuaternionD GetOrientationError() {
+                return TargetOrientation / GetWorldOrientation();
             }
 
             public void ReloadRotationBlockReferences() {

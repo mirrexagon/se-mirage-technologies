@@ -38,9 +38,6 @@ namespace IngameScript {
             // The all-important Program.
             Program program;
 
-            // World constants
-            public static readonly double MAXIMUM_SPEED = 105;
-
             // Ship controllers
             List<IMyShipController> shipControllers;
             List<IMyRemoteControl> remoteControls;
@@ -61,11 +58,12 @@ namespace IngameScript {
                 }
 
                 ReloadBlockReferences();
+
+                TargetOrientation = GetWorldOrientation();
+                TargetVelocity = Vector3D.Zero;
             }
 
-            public void Update(double dt) {
-                program.ClearLog();
-
+            public virtual void Update(double dt) {
                 UpdateOrientationControl(dt);
                 UpdateVelocity(dt);
                 UpdateVelocityControl(dt);
