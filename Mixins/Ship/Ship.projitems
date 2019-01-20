@@ -9,8 +9,6 @@
     <Import_RootNamespace>Ship</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Rotation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Ship.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Translation.cs" />
   </ItemGroup>
 </Project>

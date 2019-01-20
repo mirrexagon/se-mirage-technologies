@@ -35,11 +35,11 @@ namespace IngameScript {
                     dt = 0.01;
                 }
 
-                ship.rotation.SetGyroOverrideEnabled(true);
+                ship.SetGyroOverrideEnabled(true);
                 ship.SetInertialDampenersEnabled(false);
 
                 if ((updateSource & (UpdateType.Trigger | UpdateType.Terminal)) != 0) {
-                    //ship.translation.targetPosition = new Vector3D(0, double.Parse(argument), 0);
+                    ship.TargetVelocity = new Vector3D(0, 0, double.Parse(argument));
                 }
 
                 if ((updateSource & UpdateType.Update10) != 0) {
