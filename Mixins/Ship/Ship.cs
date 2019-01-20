@@ -41,7 +41,7 @@ namespace IngameScript {
             List<IMyRemoteControl> remoteControls;
             List<IMyCockpit> cockpits;
 
-            IMyTerminalBlock orientationReference;
+            IMyShipController orientationReference;
 
             public Rotation rotation;
             public Translation translation;
@@ -79,7 +79,7 @@ namespace IngameScript {
                 translation.ReloadBlockReferences();
             }
 
-            IMyTerminalBlock FindOrientationReference() {
+            IMyShipController FindOrientationReference() {
                 ReloadShipControllerReferences();
 
                 IMyRemoteControl mainRemoteControl = remoteControls.FindAll(rc => rc.IsMainCockpit).FirstOrDefault();

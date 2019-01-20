@@ -25,7 +25,7 @@ namespace IngameScript {
 
             Program program;
 
-            IMyTerminalBlock orientationReference;
+            IMyShipController orientationReference;
 
             List<IMyThrust> allThrusters;
 
@@ -42,7 +42,7 @@ namespace IngameScript {
             Vector3D lastPosition;
             Vector3D lastVelocity; // position units per second.
 
-            public Translation(Program program, IMyTerminalBlock orientationReference) {
+            public Translation(Program program, IMyShipController orientationReference) {
                 this.program = program;
                 this.orientationReference = orientationReference;
 
@@ -131,7 +131,11 @@ namespace IngameScript {
             }
 
             public Vector3D GetWorldPosition() {
-                return program.Me.CubeGrid.GetPosition();
+                return orientationReference.CenterOfMass;
+            }
+
+            public float GetShipMass() {
+                return orientationReference.CalculateShipMass().TotalMass;
             }
 
             public Vector3D GetWorldVelocity() {

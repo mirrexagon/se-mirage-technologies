@@ -40,13 +40,13 @@ namespace IngameScript {
         public class Rotation {
             Program program;
 
-            IMyTerminalBlock orientationReference;
+            IMyShipController orientationReference;
             List<IMyGyro> gyroBlocks;
 
             // Target world orientation of the orientation reference.
             public QuaternionD targetOrientation = QuaternionD.Identity;
 
-            public Rotation(Program program, IMyTerminalBlock orientationReference) {
+            public Rotation(Program program, IMyShipController orientationReference) {
                 this.program = program;
                 this.orientationReference = orientationReference;
 
