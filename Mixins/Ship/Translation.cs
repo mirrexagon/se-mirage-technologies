@@ -90,17 +90,11 @@ namespace IngameScript {
                 Vector3D.Normalize(ref thrust_N, out thrustDirection);
 
                 double desiredThrust_N = thrust_N.Length();
-                program.Log($"Desired: {desiredThrust_N}");
-
                 double maxPossibleThrust_N = CalculateMaxThrustInDirection(thrustDirection);
-
-                program.Log($"Max possible: {maxPossibleThrust_N}");
 
                 if (maxPossibleThrust_N < desiredThrust_N) {
                     thrust_N = thrustDirection * maxPossibleThrust_N;
                 }
-
-                program.Log($"Actual: {thrust_N.Length()}");
 
                 SetThrustRaw(thrust_N);
                 return thrust_N;
@@ -144,7 +138,6 @@ namespace IngameScript {
                 // ---
 
                 double limitingThrust = absMaxThrust.AbsMin();
-                program.Log($"Limiting thrust: {limitingThrust}");
                 direction *= limitingThrust;
 
                 return direction.Length();
