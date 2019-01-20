@@ -69,6 +69,16 @@ namespace IngameScript {
                 UpdateVelocityControl(dt);
             }
 
+            public void SetAutoControlEnabled(bool enabled) {
+                SetInertialDampenersEnabled(!enabled);
+                SetGyroOverrideEnabled(enabled);
+
+                foreach (IMyShipController shipController in shipControllers) {
+                    shipController.ControlThrusters = !enabled;
+                    shipController.ControlWheels = !enabled;
+                }
+            }
+
             public void SetInertialDampenersEnabled(bool enabled) {
                 foreach (IMyShipController shipController in shipControllers) {
                     shipController.DampenersOverride = enabled;

@@ -27,11 +27,18 @@ namespace IngameScript {
                 TURN_TO_TARGET,
                 CRUISE_TO_TARGET,
                 DECELERATE_AT_TARGET,
+                FINETUNE_POSITION_AT_TARGET,
             }
 
             Program program;
-            public Vector3D targetPosition = Vector3D.Zero;
+
+            double CRUISE_SPEED = 100;
+
             Phase currentPhase = Phase.IDLE;
+            public Vector3D targetPosition = Vector3D.Zero;
+
+            Vector3D currentCourseStartPosition;
+            Vector3D currentCourseVector;
 
             public NavigationSystem(Program program) : base(program) {
                 this.program = program;
@@ -78,9 +85,40 @@ namespace IngameScript {
                     case Phase.CRUISE_TO_TARGET:
                         program.Log($"Velocity: {GetWorldVelocity().Length()}");
                         program.Log($"Velocity error: {GetVelocityError().Length()}");
-
                         program.Log($"Distance to target: {CalculateDistanceToTarget()}");
 
+                        // -- Stay on the course vector.
+                        // Use a coordinate system where the course vector points toward -Z and starts
+                        // the origin.
+                        MatrixD transformCourseVectorToWorld = MatrixD.CreateFromQuaternion(
+                            QuaternionD.CreateFromForwardUp(currentCourseVector, Vector3D.Up));
+                        transformCourseVectorToWorld.Translation = currentCourseStartPosition;
+
+                        MatrixD transformWorldToCourseVector = MatrixD.Invert(transformCourseVectorToWorld);
+
+                        /*
+                        // Calculate target velocity in course space.
+                        Vector3D courseSpaceShipPosition = Vector3D.Transform(GetWorldPosition(), transformWorldToCourseVector);
+                        Vector3D courseSpaceTargetPosition = new Vector3D(0, 0, 0);
+
+                        // We're deliberately ignoring the Z component of the error, since
+                        // we don't want to be at the start position, we want to be cruising
+                        // to the destination.
+                        Vector3D courseSpaceError = courseSpaceTargetPosition - courseSpaceShipPosition;
+                        courseSpaceError.Z = 0;
+
+                        program.Log($"Course space error: {courseSpaceError}");
+                        */
+
+                        Vector3D courseSpaceTargetVelocity = new Vector3D(
+                            0,//0.8 * courseSpaceError.X,
+                            0,//0.8 * courseSpaceError.Y,
+                            CRUISE_SPEED);
+
+                        //TargetVelocity = Vector3D.Transform(courseSpaceTargetVelocity, transformCourseVectorToWorld.GetOrientation());
+                        program.Log($"TargetVelocity: {TargetVelocity}");
+
+                        // -- If we get within stopping distance, start decelerating.
                         double stoppingDistance = CalculateStoppingDistance(GetWorldVelocity().Length());
                         program.Log($"Stopping distance: {stoppingDistance}");
 
@@ -98,6 +136,9 @@ namespace IngameScript {
                         }
                         break;
 
+                    case Phase.FINETUNE_POSITION_AT_TARGET:
+                        break;
+
                     default:
                         break;
                 }
@@ -110,13 +151,11 @@ namespace IngameScript {
             void ToPhase(Phase phase) {
                 switch (phase) {
                     case Phase.IDLE:
-                        SetGyroOverrideEnabled(false);
-                        SetInertialDampenersEnabled(true);
+                        SetAutoControlEnabled(false);
                         break;
 
                     case Phase.PRE_NAVIGATION:
-                        SetGyroOverrideEnabled(true);
-                        SetInertialDampenersEnabled(false);
+                        SetAutoControlEnabled(true);
 
                         Vector3D velocityDirection = GetWorldVelocity();
                         double currentSpeed = velocityDirection.Normalize();
@@ -136,13 +175,20 @@ namespace IngameScript {
                         break;
 
                     case Phase.CRUISE_TO_TARGET:
+                        currentCourseStartPosition = GetWorldPosition();
+
                         Vector3D toTarget = CalculateVectorToTarget();
+                        currentCourseVector = toTarget;
+
                         toTarget.Normalize();
                         TargetVelocity = toTarget * 100;
                         break;
 
                     case Phase.DECELERATE_AT_TARGET:
                         TargetVelocity = Vector3D.Zero;
+                        break;
+
+                    case Phase.FINETUNE_POSITION_AT_TARGET:
                         break;
 
                     default:

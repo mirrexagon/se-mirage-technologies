@@ -19,7 +19,7 @@ namespace IngameScript {
     partial class Program {
         partial class Ship {
             public Vector3D TargetVelocity { get; set; }
-            readonly double velocitySmoothingLimit = 4;
+            readonly double velocitySmoothingLimit = 20;
 
             // All thruster blocks in the ship, categorized by the direction
             // they cause acceleration in.
