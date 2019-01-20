@@ -20,16 +20,17 @@ namespace IngameScript {
         public class Translation {
             Program program;
 
+            // Max speed the ship can travel at (world-specific).
+            public static readonly double MAXIMUM_SPEED = 105;
+
             // Blocks.
             IMyShipController orientationReference;
             List<IMyThrust> allThrusters;
             Dictionary<Base6Directions.Direction, List<IMyThrust>> thrusters; // Key is direction that the thrusters cause acceleration in.
 
             // Targets.
-            public Vector3D targetVelocity = new Vector3D(0, 0, 0);
+            Vector3D targetVelocity = new Vector3D(0, 0, 0);
             readonly double velocitySmoothingLimit = 4;
-
-            public Vector3D targetPosition = new Vector3D(0, 0, 0);
 
             // Velocity calculation.
             Vector3D lastPosition;
@@ -37,7 +38,11 @@ namespace IngameScript {
 
             // Cached values.
             Dictionary<Base6Directions.Direction, double> maxThrustInDirection;
+            double minPossibleThrustInAnyDirection;
             double maxPossibleThrustInAnyDirection;
+            Base6Directions.Direction maxThrustDirection;
+
+            double shipMass;
 
             public Translation(Program program, IMyShipController orientationReference) {
                 this.program = program;
@@ -49,10 +54,6 @@ namespace IngameScript {
             public void Update(double dt) {
                 UpdateVelocity(dt);
                 UpdateVelocityControl(dt);
-            }
-
-            void UpdatePositionControl(double dt) {
-                Vector3D positionError = targetPosition - GetWorldPosition();
             }
 
             void UpdateVelocityControl(double dt) {
@@ -143,18 +144,23 @@ namespace IngameScript {
                 return direction.Length();
             }
 
-            double GetMaxThrustInDirection(Base6Directions.Direction direction) {
+            public double GetMaxThrustInDirection(Base6Directions.Direction direction) {
                 return maxThrustInDirection[direction];
             }
 
-            double GetMaxThrustInAnyDirection() {
+            public double GetMaxThrustInAnyDirection() {
                 return maxPossibleThrustInAnyDirection;
+            }
+
+            public double GetMinThrustInAnyDirection() {
+                return minPossibleThrustInAnyDirection;
             }
 
             public void ReloadBlockReferences() {
                 thrusters = new Dictionary<Base6Directions.Direction, List<IMyThrust>>();
                 maxThrustInDirection = new Dictionary<Base6Directions.Direction, double>();
                 maxPossibleThrustInAnyDirection = 0;
+                minPossibleThrustInAnyDirection = 0;
 
                 foreach (Base6Directions.Direction direction in Base6Directions.EnumDirections) {
                     thrusters.Add(direction, new List<IMyThrust>());
@@ -182,20 +188,24 @@ namespace IngameScript {
 
                 // Update maximum thrust in any direction.
                 foreach (Base6Directions.Direction direction in Base6Directions.EnumDirections) {
-                    double maxThrust = maxThrustInDirection[direction];
-
-                    if (maxThrust > maxPossibleThrustInAnyDirection) {
-                        maxPossibleThrustInAnyDirection = maxThrust;
+                    double maxThrustForDirection = maxThrustInDirection[direction];
+                    if (maxThrustForDirection > maxPossibleThrustInAnyDirection) {
+                        maxPossibleThrustInAnyDirection = maxThrustForDirection;
+                        maxThrustDirection = direction;
                     }
+
+                    minPossibleThrustInAnyDirection = Math.Min(minPossibleThrustInAnyDirection, maxThrustForDirection);
                 }
+
+                shipMass = orientationReference.CalculateShipMass().TotalMass;
             }
 
             public Vector3D GetWorldPosition() {
                 return orientationReference.CenterOfMass;
             }
 
-            public float GetShipMass() {
-                return orientationReference.CalculateShipMass().TotalMass;
+            public double GetShipMass() {
+                return shipMass;
             }
 
             public Vector3D GetWorldVelocity() {
