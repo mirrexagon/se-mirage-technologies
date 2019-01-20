@@ -25,7 +25,6 @@ namespace IngameScript {
                 PRE_NAVIGATION,
 
                 TURN_TO_TARGET,
-                ACCELERATE_TO_TARGET,
                 CRUISE_TO_TARGET,
                 DECELERATE_AT_TARGET,
             }
@@ -36,6 +35,8 @@ namespace IngameScript {
 
             public NavigationSystem(Program program) : base(program) {
                 this.program = program;
+
+                ToPhase(Phase.IDLE);
             }
 
             public void SetTargetPosition(Vector3D targetPosition) {
@@ -49,31 +50,52 @@ namespace IngameScript {
                         break;
 
                     case Phase.PRE_NAVIGATION:
+                        QuaternionD error = GetOrientationError();
+                        Vector3D axis;
+                        double angle;
+                        error.GetAxisAngle(out axis, out angle);
+                        program.Log($"Orientation error: {angle}");
+
+                        program.Log($"Velocity: {GetWorldVelocity().Length()}");
+                        program.Log($"Velocity error: {GetVelocityError().Length()}");
+
                         if (GetWorldVelocity().LengthSquared() < 1) {
                             ToPhase(Phase.TURN_TO_TARGET);
                         }
                         break;
 
                     case Phase.TURN_TO_TARGET:
-                        QuaternionD error = GetOrientationError();
-                        Vector3D axis;
-                        double angle;
+                        error = GetOrientationError();
                         error.GetAxisAngle(out axis, out angle);
 
-                        program.Log($"Error: {angle}");
+                        program.Log($"Orientation error: {angle}");
 
                         if (angle < 0.001) {
-                            ToPhase(Phase.IDLE);
+                            ToPhase(Phase.CRUISE_TO_TARGET);
                         }
                         break;
 
-                    case Phase.ACCELERATE_TO_TARGET:
-                        break;
-
                     case Phase.CRUISE_TO_TARGET:
+                        program.Log($"Velocity: {GetWorldVelocity().Length()}");
+                        program.Log($"Velocity error: {GetVelocityError().Length()}");
+
+                        program.Log($"Distance to target: {CalculateDistanceToTarget()}");
+
+                        double stoppingDistance = CalculateStoppingDistance(GetWorldVelocity().Length());
+                        program.Log($"Stopping distance: {stoppingDistance}");
+
+                        if (CalculateDistanceToTarget() <= stoppingDistance) {
+                            ToPhase(Phase.DECELERATE_AT_TARGET);
+                        }
                         break;
 
                     case Phase.DECELERATE_AT_TARGET:
+                        program.Log($"Velocity: {GetWorldVelocity().Length()}");
+                        program.Log($"Velocity error: {GetVelocityError().Length()}");
+
+                        if (GetWorldVelocity().LengthSquared() < 1) {
+                            ToPhase(Phase.IDLE);
+                        }
                         break;
 
                     default:
@@ -101,7 +123,9 @@ namespace IngameScript {
 
                         if (currentSpeed > 30) {
                             // Face backwards so rear thrusters can be used to slow down.
-                            PointAt(-velocityDirection);
+                            Vector3D forward = -velocityDirection;
+                            forward.Normalize();
+                            TargetOrientation = QuaternionD.CreateFromForwardUp(forward, Vector3D.Up);
                         }
 
                         TargetVelocity = Vector3D.Zero;
@@ -111,13 +135,14 @@ namespace IngameScript {
                         PointAt(targetPosition);
                         break;
 
-                    case Phase.ACCELERATE_TO_TARGET:
-                        break;
-
                     case Phase.CRUISE_TO_TARGET:
+                        Vector3D toTarget = CalculateVectorToTarget();
+                        toTarget.Normalize();
+                        TargetVelocity = toTarget * 100;
                         break;
 
                     case Phase.DECELERATE_AT_TARGET:
+                        TargetVelocity = Vector3D.Zero;
                         break;
 
                     default:
@@ -128,10 +153,23 @@ namespace IngameScript {
             }
 
             void PointAt(Vector3D targetPosition) {
-                Vector3D forward = targetPosition - GetWorldPosition();
+                Vector3D forward = CalculateVectorToTarget();
                 forward.Normalize();
-                Vector3D up = Vector3D.Up;
-                TargetOrientation = QuaternionD.CreateFromForwardUp(forward, up);
+                TargetOrientation = QuaternionD.CreateFromForwardUp(forward, Vector3D.Up);
+            }
+
+            Vector3D CalculateVectorToTarget() {
+                return targetPosition - GetWorldPosition();
+            }
+
+            double CalculateDistanceToTarget() {
+                return CalculateVectorToTarget().Length();
+            }
+
+            double CalculateStoppingDistance(double speed) {
+                double a = MinPossibleThrustInAnyDirection / Mass;
+                program.Log($"a:{a} minthrust:{MinPossibleThrustInAnyDirection} mass:{Mass}");
+                return (speed * speed) / (2 * a);
             }
         }
     }

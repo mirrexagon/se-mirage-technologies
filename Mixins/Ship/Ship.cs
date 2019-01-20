@@ -46,7 +46,7 @@ namespace IngameScript {
             IMyShipController orientationReference;
 
             // Useful ship information.
-            double shipMass;
+            public double Mass { get; private set; }
 
             public Ship(Program program) {
                 this.program = program;
@@ -75,10 +75,6 @@ namespace IngameScript {
                 }
             }
 
-            public double GetShipMass() {
-                return shipMass;
-            }
-
             // ---
 
             public void ReloadBlockReferences() {
@@ -88,7 +84,7 @@ namespace IngameScript {
                 ReloadRotationBlockReferences();
                 ReloadTranslationBlockReferences();
 
-                shipMass = orientationReference.CalculateShipMass().TotalMass;
+                Mass = orientationReference.CalculateShipMass().TotalMass;
             }
 
             IMyShipController FindOrientationReference() {

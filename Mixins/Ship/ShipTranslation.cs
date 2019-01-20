@@ -32,8 +32,8 @@ namespace IngameScript {
 
             // Cached values.
             Dictionary<Base6Directions.Direction, double> maxThrustInDirection;
-            double minPossibleThrustInAnyDirection;
-            double maxPossibleThrustInAnyDirection;
+            public double MinPossibleThrustInAnyDirection { get; private set; }
+            public double MaxPossibleThrustInAnyDirection { get; private set; }
             Base6Directions.Direction maxThrustDirection;
 
             void UpdateVelocityControl(double dt) {
@@ -57,7 +57,7 @@ namespace IngameScript {
                         responseThrust = localVelocityErrorDirection;
                     }
 
-                    SetThrust(responseThrust * maxPossibleThrustInAnyDirection * 2);
+                    SetThrust(responseThrust * MaxPossibleThrustInAnyDirection * 2);
                 }
             }
 
@@ -147,8 +147,8 @@ namespace IngameScript {
                 // (Re)initialize fields.
                 thrusters = new Dictionary<Base6Directions.Direction, List<IMyThrust>>();
                 maxThrustInDirection = new Dictionary<Base6Directions.Direction, double>();
-                maxPossibleThrustInAnyDirection = 0;
-                minPossibleThrustInAnyDirection = 0;
+                MaxPossibleThrustInAnyDirection = 0;
+                MinPossibleThrustInAnyDirection = double.MaxValue;
 
                 foreach (Base6Directions.Direction direction in Base6Directions.EnumDirections) {
                     thrusters.Add(direction, new List<IMyThrust>());
@@ -178,12 +178,12 @@ namespace IngameScript {
                 // Update maximum thrust in any direction.
                 foreach (Base6Directions.Direction direction in Base6Directions.EnumDirections) {
                     double maxThrustForDirection = maxThrustInDirection[direction];
-                    if (maxThrustForDirection > maxPossibleThrustInAnyDirection) {
-                        maxPossibleThrustInAnyDirection = maxThrustForDirection;
+                    if (maxThrustForDirection > MaxPossibleThrustInAnyDirection) {
+                        MaxPossibleThrustInAnyDirection = maxThrustForDirection;
                         maxThrustDirection = direction;
                     }
 
-                    minPossibleThrustInAnyDirection = Math.Min(minPossibleThrustInAnyDirection, maxThrustForDirection);
+                    MinPossibleThrustInAnyDirection = Math.Min(MinPossibleThrustInAnyDirection, maxThrustForDirection);
                 }
             }
         }
