@@ -17,6 +17,23 @@ using VRageMath;
 
 namespace IngameScript {
     partial class Program {
+        IMyTextPanel debugPanel;
+        string debugText = "";
+
+        public void Log(string s) {
+            if (debugPanel != null) {
+                debugText += s + "\n";
+                debugPanel.WritePublicText(debugText);
+            }
+        }
+
+        public void ClearLog() {
+            if (debugPanel != null) {
+                debugText = "";
+                debugPanel.WritePublicText(debugText);
+            }
+        }
+
         public class Ship {
             Program program;
 
@@ -31,12 +48,21 @@ namespace IngameScript {
 
             public Ship(Program program) {
                 this.program = program;
+
+                IMyTerminalBlock possibleDebugPanel = program.GridTerminalSystem.GetBlockWithName("Debug Panel");
+
+                if (possibleDebugPanel != null) {
+                    program.debugPanel = (IMyTextPanel)possibleDebugPanel;
+                }
+
                 orientationReference = FindOrientationReference();
                 rotation = new Rotation(program, orientationReference);
                 translation = new Translation(program, orientationReference);
             }
 
             public void Update(double dt) {
+                program.ClearLog();
+
                 rotation.Update(dt);
                 translation.Update(dt);
             }

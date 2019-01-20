@@ -35,7 +35,7 @@ namespace IngameScript {
                     dt = 0.01;
                 }
 
-                ship.rotation.SetGyroOverrideEnabled(true);
+                ship.rotation.SetGyroOverrideEnabled(false);
                 ship.SetInertialDampenersEnabled(false);
 
                 if ((updateSource & (UpdateType.Trigger | UpdateType.Terminal)) != 0) {

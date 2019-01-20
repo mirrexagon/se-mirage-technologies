@@ -42,14 +42,9 @@ namespace IngameScript {
             Vector3D lastPosition;
             Vector3D lastVelocity; // position units per second.
 
-            // Transformations.
-            MatrixD rotateWorldToOrientationReference;
-
             public Translation(Program program, IMyTerminalBlock orientationReference) {
                 this.program = program;
                 this.orientationReference = orientationReference;
-                rotateWorldToOrientationReference = MatrixD.Transpose(orientationReference.WorldMatrix.GetOrientation());
-
 
                 ReloadBlockReferences();
             }
@@ -60,23 +55,25 @@ namespace IngameScript {
             }
 
             void UpdateVelocityControl(double dt) {
-                Vector3D velocityError = targetVelocity - GetWorldVelocity();
-                program.Echo($"Velocity error: {velocityError.Length()}");
+                Vector3D velocityErrorDirection = targetVelocity - GetWorldVelocity();
+                double speedError = velocityErrorDirection.Normalize();
+                program.Log($"World: {velocityErrorDirection}");
 
-                if (velocityError.LengthSquared() > 0) {
-                    Vector3D localVelocityErrorDirection = Vector3D.Transform(velocityError, rotateWorldToOrientationReference);
-                    double speedError = localVelocityErrorDirection.Normalize();
+                if (speedError > 0) {
+                    Vector3D localVelocityErrorDirection = Vector3D.TransformNormal(velocityErrorDirection,
+                        MatrixD.Transpose(orientationReference.WorldMatrix.GetOrientation()));
+                    program.Log($"Local: {localVelocityErrorDirection}");
 
+                    // If the velocity error is above the velocitySmoothingLimit, 
+                    // accelerate at full power. Otherwise, linearly reduce
+                    // power with regards to how close we are to the speed target.
                     Vector3D responseThrust;
                     if (speedError < velocitySmoothingLimit) {
                         double response = speedError / velocitySmoothingLimit;
-                        program.Echo($"Response amount: {response}");
                         responseThrust = localVelocityErrorDirection * response;
                     } else {
                         responseThrust = localVelocityErrorDirection;
                     }
-
-                    program.Echo($"Response thrust: {responseThrust.Length()}");
 
                     SetThrust(responseThrust);
                 }
