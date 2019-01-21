@@ -62,7 +62,7 @@ namespace IngameScript {
                 if (errorDistance > 0) {
                     Vector3D responseVelocity;
                     if (errorDistance <= maximumPossibleStoppingDistance) {
-                        double response = errorDistance / maximumPossibleStoppingDistance;
+                        double response = Math.Log(1 + (errorDistance / maximumPossibleStoppingDistance), 10);
                         responseVelocity = positionErrorDirection * response;
                     } else {
                         responseVelocity = positionErrorDirection;
@@ -96,6 +96,8 @@ namespace IngameScript {
                         responseThrust = localVelocityErrorDirection;
                     }
 
+                    // We set this higher than the possible max thrust because SetThrust()
+                    // will cap the speed at the actual possible max thrust for the direction.
                     SetThrust(responseThrust * MaxPossibleThrustInAnyDirection * 2);
                 }
             }
@@ -157,6 +159,8 @@ namespace IngameScript {
                 SetThrustInDirection(Base6Directions.Direction.Right, rightThrust);
                 SetThrustInDirection(Base6Directions.Direction.Up, upThrust);
                 SetThrustInDirection(Base6Directions.Direction.Down, downThrust);
+
+                program.Log($"Actual set thrust: {thrust_N.Length()}");
             }
 
             void SetThrustInDirection(Base6Directions.Direction direction, double thrust_newtons) {
