@@ -35,6 +35,12 @@ namespace IngameScript {
         }
 
         partial class Ship {
+            // Maximum speed the ship will travel at.
+            // Used to calculate stopping distance and as cruising speed for position control.
+            // Warning: This does not limit what you can set TargetVelocity
+            // to, only
+            public double MAXIMUM_SPEED = 105;
+
             // The all-important Program.
             Program program;
 
@@ -55,6 +61,20 @@ namespace IngameScript {
                     SetInertialDampenersEnabled(!value);
                     SetPlayerCanControlThrusters(!value);
                     _velocityControlEnabled = value;
+                }
+            }
+
+            bool _positionControlEnabled = false;
+            public bool PositionControlEnabled {
+                get { return _positionControlEnabled; }
+                set {
+                    // Position control requires velocity control.
+                    // Enable velocity control if needed, but do not disable.
+                    if (value && !VelocityControlEnabled) {
+                        VelocityControlEnabled = true;
+                    }
+                    
+                    _positionControlEnabled = value;
                 }
             }
 

@@ -18,8 +18,18 @@ using VRageMath;
 namespace IngameScript {
     partial class Program {
         partial class Ship {
+            // -- Fields --
             public Vector3D TargetVelocity { get; set; }
-            readonly double velocitySmoothingLimit = 20;
+
+            // How close we get to the target speed before we start turning the
+            // thrusters down. Currently it's just linear interpolation.
+            readonly double velocitySmoothingLimit = 20; // position units per second
+
+            public Vector3D TargetPosition { get; set; }
+
+            // TODO: Settable cruise speed.
+
+            // ---
 
             // All thruster blocks in the ship, categorized by the direction
             // they cause acceleration in.
@@ -36,6 +46,33 @@ namespace IngameScript {
             public double MaxPossibleThrustInAnyDirection { get; private set; }
             Base6Directions.Direction maxThrustDirection;
 
+            double maximumPossibleStoppingDistance;
+
+            // -- Methods --
+            void UpdatePositionControl(double dt) {
+                Vector3D positionError = GetPositionError();
+
+                double errorDistance = positionError.Normalize();
+                Vector3D positionErrorDirection = positionError;
+
+                program.Log($"Distance to target {errorDistance}");
+
+                if (errorDistance > 0) {
+                    Vector3D responseVelocity;
+                    if (errorDistance <= maximumPossibleStoppingDistance) {
+                        double response = errorDistance / maximumPossibleStoppingDistance;
+                        responseVelocity = positionErrorDirection * response;
+                    } else {
+                        responseVelocity = positionErrorDirection;
+                    }
+
+                    // TODO: Use explicit cruising speed here.
+                    TargetVelocity = positionErrorDirection * MAXIMUM_SPEED;
+                    program.Log($"Target speed: {TargetVelocity.Length()}");
+                    program.Log($"Actual speed: {GetVelocity().Length()}");
+                }
+            }
+
             void UpdateVelocityControl(double dt) {
                 Vector3D velocityError = GetVelocityError();
 
@@ -51,8 +88,8 @@ namespace IngameScript {
                     // power with regards to how close we are to the speed target.
                     Vector3D responseThrust;
                     if (speedError < velocitySmoothingLimit) {
-                        double response = speedError / velocitySmoothingLimit;
-                        responseThrust = localVelocityErrorDirection * response;
+                        double fraction = speedError / velocitySmoothingLimit;
+                        responseThrust = localVelocityErrorDirection * fraction;
                     } else {
                         responseThrust = localVelocityErrorDirection;
                     }
@@ -61,17 +98,27 @@ namespace IngameScript {
                 }
             }
 
-            public Vector3D GetWorldPosition() {
+            public Vector3D GetPosition() {
                 return orientationReference.CenterOfMass;
             }
 
-            public Vector3D GetWorldVelocity() {
+            public Vector3D GetPositionError() {
+                return TargetPosition - GetPosition();
+            }
+
+            public Vector3D GetVelocity() {
                 return lastVelocity;
             }
 
             public Vector3D GetVelocityError() {
-                return TargetVelocity - GetWorldVelocity();
+                return TargetVelocity - GetVelocity();
             }
+
+            double CalculateMaximumStoppingDistance(double speed) {
+                double a = MinPossibleThrustInAnyDirection / Mass;
+                return (speed * speed) / (2 * a);
+             }
+
 
             // Thrust is capped so that we always accelerate in a straight line,
             // regardless of orientation and different sides having different
@@ -137,10 +184,10 @@ namespace IngameScript {
             }
 
             void UpdateVelocity(double dt) {
-                Vector3D position = GetWorldPosition();
+                Vector3D position = GetPosition();
                 Vector3D positionDelta = position - lastPosition;
                 lastVelocity = positionDelta / dt;
-                lastPosition = GetWorldPosition();
+                lastPosition = GetPosition();
             }
 
             void ReloadTranslationBlockReferences() {
@@ -185,6 +232,9 @@ namespace IngameScript {
 
                     MinPossibleThrustInAnyDirection = Math.Min(MinPossibleThrustInAnyDirection, maxThrustForDirection);
                 }
+
+                // Update maximum stopping distance.
+                maximumPossibleStoppingDistance = CalculateMaximumStoppingDistance(MAXIMUM_SPEED);
             }
         }
     }
