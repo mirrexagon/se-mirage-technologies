@@ -38,6 +38,26 @@ namespace IngameScript {
             // The all-important Program.
             Program program;
 
+            // Features on/off
+            bool _orientationControlEnabled = false;
+            public bool OrientationControlEnabled {
+                get { return _orientationControlEnabled; }
+                set {
+                    SetGyroOverrideEnabled(value);
+                    _orientationControlEnabled = value;
+                }
+            }
+
+            bool _velocityControlEnabled = false;
+            public bool VelocityControlEnabled {
+                get { return _velocityControlEnabled; }
+                set {
+                    SetInertialDampenersEnabled(!value);
+                    SetPlayerCanControlThrusters(!value);
+                    _velocityControlEnabled = value;
+                }
+            }
+
             // Ship controllers
             List<IMyShipController> shipControllers;
             List<IMyRemoteControl> remoteControls;
@@ -64,18 +84,17 @@ namespace IngameScript {
             }
 
             public virtual void Update(double dt) {
-                UpdateOrientationControl(dt);
+                if (_orientationControlEnabled) {
+                    UpdateOrientationControl(dt);
+                }
+
                 UpdateVelocity(dt);
                 UpdateVelocityControl(dt);
             }
 
-            public void SetAutoControlEnabled(bool enabled) {
-                SetInertialDampenersEnabled(!enabled);
-                SetGyroOverrideEnabled(enabled);
-
+            public void SetPlayerCanControlThrusters(bool canControlThrusters) {
                 foreach (IMyShipController shipController in shipControllers) {
-                    shipController.ControlThrusters = !enabled;
-                    shipController.ControlWheels = !enabled;
+                    shipController.ControlThrusters = canControlThrusters;
                 }
             }
 

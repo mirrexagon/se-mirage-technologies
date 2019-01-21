@@ -151,11 +151,13 @@ namespace IngameScript {
             void ToPhase(Phase phase) {
                 switch (phase) {
                     case Phase.IDLE:
-                        SetAutoControlEnabled(false);
+                        OrientationControlEnabled = false;
+                        VelocityControlEnabled = false;
                         break;
 
                     case Phase.PRE_NAVIGATION:
-                        SetAutoControlEnabled(true);
+                        OrientationControlEnabled = true;
+                        VelocityControlEnabled = true;
 
                         Vector3D velocityDirection = GetWorldVelocity();
                         double currentSpeed = velocityDirection.Normalize();
