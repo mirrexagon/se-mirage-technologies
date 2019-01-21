@@ -21,6 +21,10 @@ namespace IngameScript {
 
         public Program() {
             ship = new Ship(this);
+
+            ship.TargetPosition = ship.GetPosition();
+            ship.PositionControlEnabled = true;
+
             Runtime.UpdateFrequency = UpdateFrequency.Update10;
         }
 
@@ -47,8 +51,6 @@ namespace IngameScript {
                 if ((updateSource & UpdateType.Update10) != 0) {
                     ship.Update(dt);
                 }
-
-                Log($"Current target position: {ship.TargetPosition}");
             } catch (Exception e) {
                 Echo("An error occurred during script execution.");
                 Echo($"Exception: {e}\n---");

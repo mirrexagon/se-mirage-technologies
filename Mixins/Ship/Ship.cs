@@ -59,7 +59,6 @@ namespace IngameScript {
                 get { return _velocityControlEnabled; }
                 set {
                     SetInertialDampenersEnabled(!value);
-                    SetPlayerCanControlThrusters(!value);
                     _velocityControlEnabled = value;
                 }
             }
@@ -109,12 +108,13 @@ namespace IngameScript {
                 }
 
                 UpdateVelocity(dt);
-                UpdateVelocityControl(dt);
-            }
 
-            public void SetPlayerCanControlThrusters(bool canControlThrusters) {
-                foreach (IMyShipController shipController in shipControllers) {
-                    shipController.ControlThrusters = canControlThrusters;
+                if (_positionControlEnabled) {
+                    UpdatePositionControl(dt);
+                }
+
+                if (_velocityControlEnabled) {
+                    UpdateVelocityControl(dt);
                 }
             }
 
@@ -129,11 +129,10 @@ namespace IngameScript {
             public void ReloadBlockReferences() {
                 ReloadShipControllerReferences();
                 orientationReference = FindOrientationReference();
+                Mass = orientationReference.CalculateShipMass().TotalMass;
 
                 ReloadRotationBlockReferences();
-                ReloadTranslationBlockReferences();
-
-                Mass = orientationReference.CalculateShipMass().TotalMass;
+                ReloadTranslationBlockReferences();   
             }
 
             IMyShipController FindOrientationReference() {
