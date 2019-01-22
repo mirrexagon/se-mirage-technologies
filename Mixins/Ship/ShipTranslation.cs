@@ -36,10 +36,6 @@ namespace IngameScript {
             List<IMyThrust> allThrusters;
             Dictionary<Base6Directions.Direction, List<IMyThrust>> thrusters;
 
-            // Velocity calculation.
-            Vector3D lastPosition;
-            Vector3D lastVelocity; // position units per second.
-
             // Cached values.
             Dictionary<Base6Directions.Direction, double> maxThrustInDirection;
             public double MinPossibleThrustInAnyDirection { get; private set; }
@@ -117,7 +113,7 @@ namespace IngameScript {
             }
 
             public Vector3D GetVelocity() {
-                return lastVelocity;
+                return orientationReference.GetShipVelocities().LinearVelocity;
             }
 
             public Vector3D GetVelocityError() {
@@ -193,13 +189,6 @@ namespace IngameScript {
                 direction *= limitingThrust;
 
                 return direction.Length();
-            }
-
-            void UpdateVelocity(double dt) {
-                Vector3D position = GetPosition();
-                Vector3D positionDelta = position - lastPosition;
-                lastVelocity = positionDelta / dt;
-                lastPosition = GetPosition();
             }
 
             void ReloadTranslationBlockReferences() {
