@@ -23,7 +23,7 @@ namespace IngameScript {
 
             // How close we get to the target speed before we start turning the
             // thrusters down. Currently it's just linear interpolation.
-            readonly double velocitySmoothingLimit = 20; // position units per second
+            readonly double velocitySmoothingLimit = 5; // position units per second
 
             public Vector3D TargetPosition { get; set; }
 
@@ -62,7 +62,7 @@ namespace IngameScript {
                 if (errorDistance > 0) {
                     Vector3D responseVelocity;
                     if (errorDistance <= maximumPossibleStoppingDistance) {
-                        double response = Math.Log(1 + (errorDistance / maximumPossibleStoppingDistance), 10);
+                        double response = errorDistance / maximumPossibleStoppingDistance;
                         responseVelocity = positionErrorDirection * response;
                     } else {
                         responseVelocity = positionErrorDirection;
@@ -91,6 +91,9 @@ namespace IngameScript {
                     Vector3D responseThrust;
                     if (speedError < velocitySmoothingLimit) {
                         double fraction = speedError / velocitySmoothingLimit;
+
+                        // Quadratic smoothing.
+                        fraction = fraction * fraction;
                         responseThrust = localVelocityErrorDirection * fraction;
                     } else {
                         responseThrust = localVelocityErrorDirection;

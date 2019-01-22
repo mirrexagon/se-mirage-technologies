@@ -23,7 +23,9 @@ namespace IngameScript {
             ship = new Ship(this);
 
             ship.TargetPosition = ship.GetPosition();
-            ship.PositionControlEnabled = true;
+            //ship.PositionControlEnabled = true;
+
+            ship.VelocityControlEnabled = true;
 
             Runtime.UpdateFrequency = UpdateFrequency.Update10;
         }
