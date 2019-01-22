@@ -63,6 +63,9 @@ namespace IngameScript {
                     Vector3D responseVelocity;
                     if (errorDistance <= maximumPossibleStoppingDistance) {
                         double response = errorDistance / maximumPossibleStoppingDistance;
+
+                        // Logarithmic response.
+                        response = Math.Log(response + 1, 2);
                         responseVelocity = positionErrorDirection * response;
                     } else {
                         responseVelocity = positionErrorDirection;
