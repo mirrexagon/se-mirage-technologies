@@ -22,6 +22,7 @@ namespace IngameScript {
         public Program() {
             ship = new Ship(this);
 
+            ship.OrientationControlEnabled = true;
             ship.TargetPosition = ship.GetPosition();
             ship.PositionControlEnabled = true;
 

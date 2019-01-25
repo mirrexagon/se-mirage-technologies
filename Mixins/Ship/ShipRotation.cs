@@ -41,6 +41,8 @@ namespace IngameScript {
                 double worldRotationAngle;
                 orientationError.GetAxisAngle(out worldRotationAxis, out worldRotationAngle);
 
+                program.Log($"Rotation error: {worldRotationAngle}");
+
                 foreach (IMyGyro gyro in gyros) {
                     // https://forum.keenswh.com/threads/how-can-i-roll-my-ship-to-align-its-floor-with-the-floor-of-a-station.7382390/#post-1286963408
                     MatrixD worldToGyro = MatrixD.Invert(gyro.WorldMatrix.GetOrientation());
