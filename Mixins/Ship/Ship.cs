@@ -107,8 +107,6 @@ namespace IngameScript {
                     UpdateOrientationControl(dt);
                 }
 
-                UpdateVelocity(dt);
-
                 if (_positionControlEnabled) {
                     UpdatePositionControl(dt);
                 }
