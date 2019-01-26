@@ -23,9 +23,10 @@ namespace IngameScript {
 
             // How close we get to the target speed before we start turning the
             // thrusters down. Currently it's just linear interpolation.
-            readonly double velocitySmoothingLimit = 5; // position units per second
+            readonly double velocitySmoothingLimit = 1; // position units per second
 
             public Vector3D TargetPosition { get; set; }
+            readonly double stoppingDistanceBuffer = 10; // position units
 
             // TODO: Settable cruise speed.
 
@@ -60,8 +61,6 @@ namespace IngameScript {
                     if (errorDistance <= maximumPossibleStoppingDistance) {
                         double response = errorDistance / maximumPossibleStoppingDistance;
 
-                        // Logarithmic response.
-                        response = Math.Log(response + 1, 2);
                         responseVelocity = positionErrorDirection * response;
                     } else {
                         responseVelocity = positionErrorDirection;
@@ -176,7 +175,7 @@ namespace IngameScript {
 
                 Base6Directions.Direction forwardBackwardDirection = (direction.Z < 0) ? Base6Directions.Direction.Forward : Base6Directions.Direction.Backward;
                 absMaxThrust.Z = maxThrustInDirection[forwardBackwardDirection];
-
+                
                 Base6Directions.Direction leftRightDirection = (direction.X < 0) ? Base6Directions.Direction.Left : Base6Directions.Direction.Right;
                 absMaxThrust.X = maxThrustInDirection[leftRightDirection];
 
@@ -185,10 +184,23 @@ namespace IngameScript {
 
                 // ---
 
-                double limitingThrust = absMaxThrust.AbsMin();
-                direction *= limitingThrust;
+                program.Log($"AbsMaxThrust: {absMaxThrust}");
 
-                return direction.Length();
+                direction *= absMaxThrust.Z;
+
+                if (direction.X > absMaxThrust.X) {
+                    direction *= direction.X / absMaxThrust.X;
+                }
+
+                if (direction.Y > absMaxThrust.Y) {
+                    direction *= direction.Y / absMaxThrust.Y;
+                }
+
+                // ---
+
+                double limitingThrust = direction.Normalize();
+                program.Log($"Max thrust in {direction}\n is {limitingThrust} N");
+                return limitingThrust;
             }
 
             void ReloadTranslationBlockReferences() {
@@ -235,7 +247,7 @@ namespace IngameScript {
                 }
 
                 // Update maximum stopping distance.
-                maximumPossibleStoppingDistance = CalculateMaximumStoppingDistance(MAXIMUM_SPEED);
+                maximumPossibleStoppingDistance = CalculateMaximumStoppingDistance(MAXIMUM_SPEED) + stoppingDistanceBuffer;
             }
         }
     }

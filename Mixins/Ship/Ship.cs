@@ -39,7 +39,7 @@ namespace IngameScript {
             // Used to calculate stopping distance and as cruising speed for position control.
             // Warning: This does not limit what you can set TargetVelocity
             // to, only
-            public double MAXIMUM_SPEED = 105;
+            public double MAXIMUM_SPEED = 100;
 
             // The all-important Program.
             Program program;
