@@ -23,7 +23,7 @@ namespace IngameScript {
 
             // How close we get to the target speed before we start turning the
             // thrusters down. Currently it's just linear interpolation.
-            readonly double velocitySmoothingLimit = 1; // position units per second
+            readonly double velocitySmoothingLimit = 4; // position units per second
 
             public Vector3D TargetPosition { get; set; }
 
