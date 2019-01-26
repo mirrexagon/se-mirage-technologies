@@ -22,8 +22,8 @@ namespace IngameScript {
         public Program() {
             ship = new Ship(this);
 
-            //ship.TargetOrientation = QuaternionD.Identity;
-            //ship.OrientationControlEnabled = true;
+            ship.TargetOrientation = QuaternionD.Identity;
+            ship.OrientationControlEnabled = true;
 
             ship.TargetPosition = ship.GetPosition();
             ship.PositionControlEnabled = true;

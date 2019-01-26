@@ -26,7 +26,6 @@ namespace IngameScript {
             readonly double velocitySmoothingLimit = 1; // position units per second
 
             public Vector3D TargetPosition { get; set; }
-            readonly double stoppingDistanceBuffer = 10; // position units
 
             // TODO: Settable cruise speed.
 
@@ -247,7 +246,7 @@ namespace IngameScript {
                 }
 
                 // Update maximum stopping distance.
-                maximumPossibleStoppingDistance = CalculateMaximumStoppingDistance(MAXIMUM_SPEED) + stoppingDistanceBuffer;
+                maximumPossibleStoppingDistance = CalculateMaximumStoppingDistance(MAXIMUM_SPEED) * 1.015;
             }
         }
     }
