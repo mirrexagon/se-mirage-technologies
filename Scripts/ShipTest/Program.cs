@@ -27,7 +27,6 @@ namespace IngameScript {
             //ship.OrientationControlEnabled = true;
 
             ship.TargetPosition = ship.GetPosition();
-            ship.PositionControlEnabled = true;
 
             Runtime.UpdateFrequency = UpdateFrequency.Update10;
         }
@@ -56,6 +55,7 @@ namespace IngameScript {
                         if (location != null) {
                             ship.TargetPosition = location.position;
                         }
+                        ship.PositionControlEnabled = true;
                     }
                 }
 
