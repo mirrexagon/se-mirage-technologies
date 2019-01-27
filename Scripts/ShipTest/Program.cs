@@ -21,9 +21,10 @@ namespace IngameScript {
 
         public Program() {
             ship = new Ship(this);
+            ship.MAXIMUM_SPEED = 250;
 
-            ship.TargetOrientation = QuaternionD.Identity;
-            ship.OrientationControlEnabled = true;
+            //ship.TargetOrientation = QuaternionD.Identity;
+            //ship.OrientationControlEnabled = true;
 
             ship.TargetPosition = ship.GetPosition();
             ship.PositionControlEnabled = true;
@@ -45,9 +46,16 @@ namespace IngameScript {
                 }
 
                 if ((updateSource & (UpdateType.Trigger | UpdateType.Terminal)) != 0) {
-                    GPSLocation location = GPSLocation.FromString(argument);
-                    if (location != null) {
-                        ship.TargetPosition = location.position;
+                    if (argument == "panic") {
+                        ship.OrientationControlEnabled = false;
+                        ship.PositionControlEnabled = false;
+                        ship.VelocityControlEnabled = false;
+                        ship.SetInertialDampenersEnabled(true);
+                    } else {
+                        GPSLocation location = GPSLocation.FromString(argument);
+                        if (location != null) {
+                            ship.TargetPosition = location.position;
+                        }
                     }
                 }
 

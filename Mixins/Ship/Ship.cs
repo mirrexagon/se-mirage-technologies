@@ -37,8 +37,7 @@ namespace IngameScript {
         partial class Ship {
             // Maximum speed the ship will travel at.
             // Used to calculate stopping distance and as cruising speed for position control.
-            // Warning: This does not limit what you can set TargetVelocity
-            // to, only
+            // Warning: This does not limit what you can set TargetVelocity.
             public double MAXIMUM_SPEED = 100;
 
             // The all-important Program.
