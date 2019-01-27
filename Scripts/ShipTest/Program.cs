@@ -21,7 +21,7 @@ namespace IngameScript {
 
         public Program() {
             ship = new Ship(this);
-            ship.MAXIMUM_SPEED = 250;
+            ship.CruiseSpeed = 200;
 
             //ship.TargetOrientation = QuaternionD.Identity;
             //ship.OrientationControlEnabled = true;

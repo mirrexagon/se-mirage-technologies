@@ -19,6 +19,10 @@ namespace IngameScript {
     partial class Program {
         partial class Ship {
             // -- Fields --
+            // Used to calculate stopping distance and as cruising speed for position control.
+            // Warning: This does not limit what you can set TargetVelocity.
+            public double CruiseSpeed = 100;
+
             public Vector3D TargetVelocity { get; set; }
 
             // How close we get to the target speed before we start turning the
@@ -66,7 +70,7 @@ namespace IngameScript {
                     }
 
                     // TODO: Use explicit cruising speed here.
-                    TargetVelocity = responseVelocity * MAXIMUM_SPEED;
+                    TargetVelocity = responseVelocity * CruiseSpeed;
                     program.Log($"Target speed: {TargetVelocity.Length()}");
                     program.Log($"Actual speed: {GetVelocity().Length()}");
                 }
@@ -246,7 +250,7 @@ namespace IngameScript {
                 }
 
                 // Update maximum stopping distance.
-                maximumPossibleStoppingDistance = CalculateMaximumStoppingDistance(MAXIMUM_SPEED) * 1.015;
+                maximumPossibleStoppingDistance = CalculateMaximumStoppingDistance(CruiseSpeed) * 1.015;
             }
         }
     }
