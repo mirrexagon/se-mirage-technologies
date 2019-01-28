@@ -50,6 +50,7 @@ namespace IngameScript {
                         ship.PositionControlEnabled = false;
                         ship.VelocityControlEnabled = false;
                         ship.SetInertialDampenersEnabled(true);
+                        ship.SetThrustToZero();
                     } else {
                         GPSLocation location = GPSLocation.FromString(argument);
                         if (location != null) {

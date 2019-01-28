@@ -171,6 +171,10 @@ namespace IngameScript {
                 program.Log($"Actual set thrust: {thrust_N.Length()}");
             }
 
+            public void SetThrustToZero() {
+                SetThrustRaw(Vector3D.Zero);
+            }
+
             void SetThrustInDirection(Base6Directions.Direction direction, double thrust_newtons) {
                 foreach (IMyThrust thruster in thrusters[direction]) {
                     thruster.ThrustOverride = (float)thrust_newtons;
