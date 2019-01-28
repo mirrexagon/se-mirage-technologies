@@ -24,6 +24,14 @@ namespace IngameScript {
             // All gyros on the ship.
             List<IMyGyro> gyros;
 
+            public void PointInDirection(Vector3D forward) {
+                TargetOrientation = QuaternionD.CreateFromForwardUp(forward, Vector3D.Up);
+            }
+
+            public void PointAt(Vector3D worldPosition) {
+                PointInDirection(worldPosition - GetPosition());
+            }
+
             public QuaternionD GetWorldOrientation() {
                 return QuaternionD.CreateFromRotationMatrix(orientationReference.WorldMatrix.GetOrientation());
             }
