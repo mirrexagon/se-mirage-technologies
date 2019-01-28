@@ -121,7 +121,7 @@ namespace IngameScript {
             public void ReloadBlockReferences() {
                 ReloadShipControllerReferences();
                 orientationReference = FindOrientationReference();
-                Mass = orientationReference.CalculateShipMass().TotalMass;
+                Mass = orientationReference.CalculateShipMass().PhysicalMass;
 
                 ReloadRotationBlockReferences();
                 ReloadTranslationBlockReferences();   
