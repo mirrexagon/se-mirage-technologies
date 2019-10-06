@@ -60,9 +60,7 @@ namespace IngameScript {
                     }
                 }
 
-                if ((updateSource & UpdateType.Update10) != 0) {
-                    ship.Update(dt);
-                }
+                ship.Update(dt);
             } catch (Exception e) {
                 Echo("An error occurred during script execution.");
                 Echo($"Exception: {e}\n---");
