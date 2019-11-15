@@ -16,3 +16,9 @@ Drone used this information to maneuver and dock
 ---
 
 Given an orientation matrix that rotates a body from zero rotation to its world orientation, it converts from the body frame to the world frame. It's how you get from a local frame to the world frame.
+
+---
+
+https://gfycat.com/UncomfortableSinfulHorse
+
+New Dawn/Harmony
