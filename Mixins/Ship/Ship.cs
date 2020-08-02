@@ -17,20 +17,20 @@ using VRageMath;
 
 namespace IngameScript {
     partial class Program {
-        IMyTextPanel debugPanel;
+        IMyTextSurface debugDisplay;
         string debugText = "";
 
         public void Log(string s) {
-            if (debugPanel != null) {
+            if (debugDisplay != null) {
                 debugText += s + "\n";
-                debugPanel.WritePublicText(debugText);
+                debugDisplay.WriteText(debugText);
             }
         }
 
         public void ClearLog() {
-            if (debugPanel != null) {
+            if (debugDisplay != null) {
                 debugText = "";
-                debugPanel.WritePublicText(debugText);
+                debugDisplay.WriteText(debugText);
             }
         }
 
@@ -84,10 +84,10 @@ namespace IngameScript {
             public Ship(Program program) {
                 this.program = program;
 
-                IMyTerminalBlock possibleDebugPanel = program.GridTerminalSystem.GetBlockWithName("Debug Panel");
+                IMyTextSurface progBlockMainDisplay = program.Me.GetSurface(0);
 
-                if (possibleDebugPanel != null) {
-                    program.debugPanel = (IMyTextPanel)possibleDebugPanel;
+                if (progBlockMainDisplay != null) {
+                    program.debugDisplay = progBlockMainDisplay;
                 }
 
                 ReloadBlockReferences();

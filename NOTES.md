@@ -15,6 +15,10 @@ Drone used this information to maneuver and dock
 
 ---
 
+Grid-to-grid communication for drone commands: https://github.com/malware-dev/MDK-SE/wiki/Antenna-Communication-(IGC)
+
+---
+
 Given an orientation matrix that rotates a body from zero rotation to its world orientation, it converts from the body frame to the world frame. It's how you get from a local frame to the world frame.
 
 ---
