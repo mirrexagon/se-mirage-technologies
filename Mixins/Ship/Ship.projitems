@@ -9,8 +9,9 @@
     <Import_RootNamespace>Ship</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ShipNavigation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ShipRotation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Ship.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ShipTranslation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ShipVelocity.cs" />
   </ItemGroup>
 </Project>

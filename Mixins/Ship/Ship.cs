@@ -102,7 +102,7 @@ namespace IngameScript {
                 }
 
                 if (_positionControlEnabled) {
-                    UpdatePositionControl(dt);
+                    UpdateStationKeeping(dt);
                 }
 
                 if (_velocityControlEnabled) {
@@ -124,7 +124,8 @@ namespace IngameScript {
                 Mass = orientationReference.CalculateShipMass().PhysicalMass;
 
                 ReloadRotationBlockReferences();
-                ReloadTranslationBlockReferences();   
+                ReloadThrustBlockReferences();
+                ReloadNavigation();
             }
 
             IMyShipController FindOrientationReference() {

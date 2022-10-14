@@ -18,22 +18,7 @@ using VRageMath;
 namespace IngameScript {
     partial class Program {
         partial class Ship {
-            // -- Fields --
-            // Used to calculate stopping distance and as cruising speed for position control.
-            // Warning: This does not limit what you can set TargetVelocity.
-            public double CruiseSpeed = 100;
-
             public Vector3D TargetVelocity { get; set; }
-
-            // How close we get to the target speed before we start turning the
-            // thrusters down. Currently it's just linear interpolation.
-            readonly double velocitySmoothingLimit = 4; // position units per second
-
-            public Vector3D TargetPosition { get; set; }
-
-            // TODO: Settable cruise speed.
-
-            // ---
 
             // All thruster blocks in the ship, categorized by the direction
             // they cause acceleration in.
@@ -45,40 +30,6 @@ namespace IngameScript {
             public double MinPossibleThrustInAnyDirection { get; private set; }
             public double MaxPossibleThrustInAnyDirection { get; private set; }
             Base6Directions.Direction maxThrustDirection;
-
-            double maximumPossibleStoppingDistance;
-
-            // -- Methods --
-            void UpdatePositionControl(double dt) {
-                Vector3D positionError = GetPositionError();
-
-                double errorDistance = positionError.Normalize();
-                Vector3D positionErrorDirection = positionError;
-
-                program.Log($"Target position: {TargetPosition}");
-                program.Log($"Distance to target: {errorDistance}");
-                program.Log($"Max stopping distance: {maximumPossibleStoppingDistance}");
-
-                if (errorDistance > 0) {
-                    Vector3D responseVelocity;
-                    if (errorDistance < 1) {
-                        responseVelocity = Vector3D.Zero;
-                    } else if (errorDistance <= maximumPossibleStoppingDistance) {
-                        double response = errorDistance / maximumPossibleStoppingDistance;
-                        program.Log($"Response: {response}");
-
-                        responseVelocity = positionErrorDirection * response;
-                    } else {
-                        responseVelocity = positionErrorDirection;
-                    }
-
-                    // TODO: Use explicit cruising speed here.
-                    TargetVelocity = responseVelocity * CruiseSpeed;
-
-                    program.Log($"Target speed: {TargetVelocity.Length()}");
-                    program.Log($"Actual speed: {GetVelocity().Length()}");
-                }
-            }
 
             void UpdateVelocityControl(double dt) {
                 Vector3D velocityError = GetVelocityError();
@@ -110,14 +61,6 @@ namespace IngameScript {
                 }
             }
 
-            public Vector3D GetPosition() {
-                return orientationReference.CenterOfMass;
-            }
-
-            public Vector3D GetPositionError() {
-                return TargetPosition - GetPosition();
-            }
-
             public Vector3D GetVelocity() {
                 return orientationReference.GetShipVelocities().LinearVelocity;
             }
@@ -125,12 +68,6 @@ namespace IngameScript {
             public Vector3D GetVelocityError() {
                 return TargetVelocity - GetVelocity();
             }
-
-            double CalculateMaximumStoppingDistance(double speed) {
-                double a = MinPossibleThrustInAnyDirection / Mass;
-                return (speed * speed) / (2 * a);
-             }
-
 
             // Thrust is capped so that we always accelerate in a straight line,
             // regardless of orientation and different sides having different
@@ -214,7 +151,7 @@ namespace IngameScript {
                 return limitingThrust;
             }
 
-            void ReloadTranslationBlockReferences() {
+            void ReloadThrustBlockReferences() {
                 // (Re)initialize fields.
                 thrusters = new Dictionary<Base6Directions.Direction, List<IMyThrust>>();
                 maxThrustInDirection = new Dictionary<Base6Directions.Direction, double>();
@@ -256,9 +193,6 @@ namespace IngameScript {
 
                     MinPossibleThrustInAnyDirection = Math.Min(MinPossibleThrustInAnyDirection, maxThrustForDirection);
                 }
-
-                // Update maximum stopping distance.
-                maximumPossibleStoppingDistance = CalculateMaximumStoppingDistance(CruiseSpeed) * 1.015;
             }
         }
     }
