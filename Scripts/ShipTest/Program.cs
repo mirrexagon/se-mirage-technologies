@@ -45,6 +45,8 @@ namespace IngameScript {
                 }
 
                 if ((updateSource & (UpdateType.Trigger | UpdateType.Terminal)) != 0) {
+                    ship.ReloadBlockReferences();
+
                     if (argument == "panic") {
                         ship.OrientationControlEnabled = false;
                         ship.PositionControlEnabled = false;

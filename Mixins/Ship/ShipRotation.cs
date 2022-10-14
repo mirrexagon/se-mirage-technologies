@@ -70,7 +70,7 @@ namespace IngameScript {
                 return TargetOrientation / GetWorldOrientation();
             }
 
-            public void ReloadRotationBlockReferences() {
+            void ReloadRotationBlockReferences() {
                 gyros = new List<IMyGyro>();
                 program.GridTerminalSystem.GetBlocksOfType(gyros, b => b.CubeGrid == program.Me.CubeGrid);
             }
