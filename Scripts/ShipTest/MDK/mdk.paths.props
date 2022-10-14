@@ -4,7 +4,7 @@
     <MDKVersion>1.4.12</MDKVersion>
     <MDKGameBinPath>D:\games\steam\SteamApps\common\SpaceEngineers\Bin64</MDKGameBinPath>
     <MDKInstallPath>c:\users\user\appdata\local\microsoft\visualstudio\16.0_733b76a3\extensions\cmkithff.0jp</MDKInstallPath>
-    <MDKOutputPath>C:\Users\andrew\AppData\Roaming\SpaceEngineers\IngameScripts\local</MDKOutputPath>
+    <MDKOutputPath>C:\Users\user\AppData\Roaming\SpaceEngineers\IngameScripts\local</MDKOutputPath>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Sandbox.Common">

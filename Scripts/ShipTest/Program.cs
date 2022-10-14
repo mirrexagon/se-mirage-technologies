@@ -23,8 +23,8 @@ namespace IngameScript {
             ship = new Ship(this);
             ship.CruiseSpeed = 200;
 
-            //ship.TargetOrientation = QuaternionD.Identity;
-            //ship.OrientationControlEnabled = true;
+            ship.TargetOrientation = QuaternionD.Identity;
+            ship.OrientationControlEnabled = true;
 
             ship.TargetPosition = ship.GetPosition();
 
@@ -41,7 +41,7 @@ namespace IngameScript {
 
                 double dt = Runtime.TimeSinceLastRun.TotalSeconds;
                 if (dt == 0) {
-                    dt = 0.01;
+                    return;
                 }
 
                 if ((updateSource & (UpdateType.Trigger | UpdateType.Terminal)) != 0) {
