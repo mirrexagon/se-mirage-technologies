@@ -26,3 +26,9 @@ Given an orientation matrix that rotates a body from zero rotation to its world 
 https://gfycat.com/UncomfortableSinfulHorse
 
 New Dawn/Harmony
+
+---
+
+Drone AI:
+
+Have a planning system on top of a runner that executes each command (change orientation, move to, etc.) - commands have end conditions, can be aborted if planner needs to replan based on new information (eg. about to collide, new remote command)
