@@ -32,3 +32,8 @@ New Dawn/Harmony
 Drone AI:
 
 Have a planning system on top of a runner that executes each command (change orientation, move to, etc.) - commands have end conditions, can be aborted if planner needs to replan based on new information (eg. about to collide, new remote command)
+
+---
+
+Warn if thrust gets too low and ship isn't responding to match, eg. when on planet and too high for atmospheric thrusters
+warn about things like not enough fuel to perform projected sequence
