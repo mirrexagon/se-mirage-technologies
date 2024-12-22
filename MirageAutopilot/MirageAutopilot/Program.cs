@@ -36,18 +36,17 @@ namespace IngameScript
             Runtime.UpdateFrequency = UpdateFrequency.Update10;
         }
 
+        public void Log(string message)
+        {
+            Echo(message);
+        }
+
         public void Main(string argument, UpdateType updateSource)
         {
+            Log($"Main: {updateSource}");
+
             try
             {
-                ship.ClearLog();
-
-                double dt = Runtime.TimeSinceLastRun.TotalSeconds;
-                if (dt == 0)
-                {
-                    return;
-                }
-
                 if ((updateSource & (UpdateType.Trigger | UpdateType.Terminal)) != 0)
                 {
                     ship.ReloadBlockReferences();
@@ -71,6 +70,12 @@ namespace IngameScript
                     }
                 }
 
+                double dt = Runtime.TimeSinceLastRun.TotalSeconds;
+                if (dt == 0)
+                {
+                    return;
+                }
+
                 ship.Update(dt);
             }
             catch (Exception e)
@@ -81,6 +86,5 @@ namespace IngameScript
                 throw;
             }
         }
-
     }
 }

@@ -59,7 +59,7 @@ namespace IngameScript
             double worldRotationAngle;
             orientationError.GetAxisAngle(out worldRotationAxis, out worldRotationAngle);
 
-            Log($"Rotation error: {worldRotationAngle}");
+            program.Log($"Rotation error: {worldRotationAngle}");
 
             foreach (IMyGyro gyro in gyros)
             {

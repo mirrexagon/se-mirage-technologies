@@ -24,28 +24,6 @@ namespace IngameScript
     {
         Program program;
 
-        // Logging
-        IMyTextSurface debugDisplay;
-        string debugText = "";
-
-        public void Log(string s)
-        {
-            if (debugDisplay != null)
-            {
-                debugText += s + "\n";
-                debugDisplay.WriteText(debugText);
-            }
-        }
-
-        public void ClearLog()
-        {
-            if (debugDisplay != null)
-            {
-                debugText = "";
-                debugDisplay.WriteText(debugText);
-            }
-        }
-
         // Features on/off
         bool _orientationControlEnabled = false;
         public bool OrientationControlEnabled
@@ -99,13 +77,6 @@ namespace IngameScript
         public Ship(Program program)
         {
             this.program = program;
-
-            IMyTextSurface progBlockMainDisplay = program.Me.GetSurface(0);
-
-            if (progBlockMainDisplay != null)
-            {
-                debugDisplay = progBlockMainDisplay;
-            }
 
             ReloadBlockReferences();
 

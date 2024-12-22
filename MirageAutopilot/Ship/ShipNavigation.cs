@@ -43,9 +43,9 @@ namespace IngameScript
             double errorDistance = positionError.Normalize();
             Vector3D positionErrorDirection = positionError;
 
-            Log($"Target position: {TargetPosition}");
-            Log($"Distance to target: {errorDistance}");
-            Log($"Max stopping distance: {maximumPossibleStoppingDistance}");
+            program.Log($"Target position: {TargetPosition}");
+            program.Log($"Distance to target: {errorDistance}");
+            program.Log($"Max stopping distance: {maximumPossibleStoppingDistance}");
 
             if (errorDistance > 0)
             {
@@ -57,7 +57,7 @@ namespace IngameScript
                 else if (errorDistance <= maximumPossibleStoppingDistance)
                 {
                     double response = errorDistance / maximumPossibleStoppingDistance;
-                    Log($"Response: {response}");
+                    program.Log($"Response: {response}");
 
                     responseVelocity = positionErrorDirection * response;
                 }
@@ -69,8 +69,8 @@ namespace IngameScript
                 // TODO: Use explicit cruising speed here.
                 TargetVelocity = responseVelocity * CruiseSpeed;
 
-                Log($"Target speed: {TargetVelocity.Length()}");
-                Log($"Actual speed: {GetVelocity().Length()}");
+                program.Log($"Target speed: {TargetVelocity.Length()}");
+                program.Log($"Actual speed: {GetVelocity().Length()}");
             }
         }
 
