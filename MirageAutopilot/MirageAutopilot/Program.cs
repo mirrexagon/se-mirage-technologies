@@ -22,51 +22,65 @@ namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
-        // This file contains your actual script.
-        //
-        // You can either keep all your code here, or you can create separate
-        // code files to make your program easier to navigate while coding.
-        //
-        // Go to:
-        // https://github.com/malware-dev/MDK-SE/wiki/Quick-Introduction-to-Space-Engineers-Ingame-Scripts
-        //
-        // to learn more about ingame scripts.
+        Ship ship;
 
         public Program()
         {
-            // The constructor, called only once every session and
-            // always before any other method is called. Use it to
-            // initialize your script. 
-            //     
-            // The constructor is optional and can be removed if not
-            // needed.
-            // 
-            // It's recommended to set Runtime.UpdateFrequency 
-            // here, which will allow your script to run itself without a 
-            // timer block.
-        }
+            ship = new Ship(this);
 
-        public void Save()
-        {
-            // Called when the program needs to save its state. Use
-            // this method to save your state to the Storage field
-            // or some other means. 
-            // 
-            // This method is optional and can be removed if not
-            // needed.
+            ship.TargetOrientation = QuaternionD.Identity;
+            ship.OrientationControlEnabled = true;
+
+            ship.TargetPosition = ship.GetPosition();
+
+            Runtime.UpdateFrequency = UpdateFrequency.Update10;
         }
 
         public void Main(string argument, UpdateType updateSource)
         {
-            // The main entry point of the script, invoked every time
-            // one of the programmable block's Run actions are invoked,
-            // or the script updates itself. The updateSource argument
-            // describes where the update came from. Be aware that the
-            // updateSource is a  bitfield  and might contain more than 
-            // one update type.
-            // 
-            // The method itself is required, but the arguments above
-            // can be removed if not needed.
+            try
+            {
+                ship.ClearLog();
+
+                double dt = Runtime.TimeSinceLastRun.TotalSeconds;
+                if (dt == 0)
+                {
+                    return;
+                }
+
+                if ((updateSource & (UpdateType.Trigger | UpdateType.Terminal)) != 0)
+                {
+                    ship.ReloadBlockReferences();
+
+                    if (argument == "panic")
+                    {
+                        ship.OrientationControlEnabled = false;
+                        ship.PositionControlEnabled = false;
+                        ship.VelocityControlEnabled = false;
+                        ship.SetInertialDampenersEnabled(true);
+                        ship.SetThrustToZero();
+                    }
+                    else
+                    {
+                        GPSLocation location = GPSLocation.FromString(argument);
+                        if (location != null)
+                        {
+                            ship.TargetPosition = location.position;
+                        }
+                        ship.PositionControlEnabled = true;
+                    }
+                }
+
+                ship.Update(dt);
+            }
+            catch (Exception e)
+            {
+                Echo("An error occurred during script execution.");
+                Echo($"Exception: {e}\n---");
+
+                throw;
+            }
         }
+
     }
 }

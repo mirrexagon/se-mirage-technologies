@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MirageAutopilot", "MirageAu
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ship", "Ship\Ship.shproj", "{8A3CDCC5-4B55-4D87-A415-698A0E1FF06F}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Utilities", "Utilities\Utilities.shproj", "{1BF6EBD8-4E9D-4A59-AE65-F31A20341028}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -25,7 +27,9 @@ Global
 		SolutionGuid = {FF5F2129-124F-48FD-90AD-74040107FEB3}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Utilities\Utilities.projitems*{1bf6ebd8-4e9d-4a59-ae65-f31a20341028}*SharedItemsImports = 13
 		Ship\Ship.projitems*{51ff81f6-03a1-45e0-a820-bf0e5d6d13dd}*SharedItemsImports = 5
+		Utilities\Utilities.projitems*{51ff81f6-03a1-45e0-a820-bf0e5d6d13dd}*SharedItemsImports = 5
 		Ship\Ship.projitems*{8a3cdcc5-4b55-4d87-a415-698a0e1ff06f}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal

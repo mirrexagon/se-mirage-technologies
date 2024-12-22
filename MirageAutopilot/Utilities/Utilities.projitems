@@ -9,9 +9,8 @@
     <Import_RootNamespace>IngameScript</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)ShipNavigation.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ShipVelocity.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ShipRotation.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Ship.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GPSLocation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MathUtilities.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PID.cs" />
   </ItemGroup>
 </Project>
