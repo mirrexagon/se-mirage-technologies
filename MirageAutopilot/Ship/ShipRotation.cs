@@ -23,27 +23,27 @@ namespace IngameScript
     internal partial class Ship
     {
         // Target world orientation of the orientation reference.
-        public QuaternionD TargetOrientation { get; set; }
+        QuaternionD TargetOrientation { get; set; }
 
         // All gyros on the ship.
         List<IMyGyro> gyros;
 
-        public void PointInDirection(Vector3D forward)
+        void PointInDirection(Vector3D forward)
         {
             TargetOrientation = QuaternionD.CreateFromForwardUp(forward, Vector3D.Up);
         }
 
-        public void PointAt(Vector3D worldPosition)
+        void PointAt(Vector3D worldPosition)
         {
             PointInDirection(worldPosition - GetPosition());
         }
 
-        public QuaternionD GetWorldOrientation()
+        QuaternionD GetWorldOrientation()
         {
             return QuaternionD.CreateFromRotationMatrix(orientationReference.WorldMatrix.GetOrientation());
         }
 
-        public void SetGyroOverrideEnabled(bool enabled)
+        void SetGyroOverrideEnabled(bool enabled)
         {
             foreach (IMyGyro gyro in gyros)
             {
@@ -77,7 +77,7 @@ namespace IngameScript
             }
         }
 
-        public QuaternionD GetOrientationError()
+        QuaternionD GetOrientationError()
         {
             return TargetOrientation / GetWorldOrientation();
         }

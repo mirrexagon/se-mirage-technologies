@@ -30,10 +30,14 @@ namespace IngameScript
         Dictionary<Base6Directions.Direction, List<IMyThrust>> thrusters;
 
         // Cached values.
-        Dictionary<Base6Directions.Direction, double> maxThrustInDirection;
         public double MinPossibleThrustInAnyDirection { get; private set; }
         public double MaxPossibleThrustInAnyDirection { get; private set; }
+        Dictionary<Base6Directions.Direction, double> maxThrustInDirection;
         Base6Directions.Direction maxThrustDirection;
+
+        // How close we get to the target speed before we start turning the
+        // thrusters down. Currently it's just linear interpolation.
+        const double VelocitySmoothingLimit = 4; // position units per second
 
         void UpdateVelocityControl(double dt)
         {
@@ -75,7 +79,7 @@ namespace IngameScript
             return orientationReference.GetShipVelocities().LinearVelocity;
         }
 
-        public Vector3D GetVelocityError()
+        Vector3D GetVelocityError()
         {
             return TargetVelocity - GetVelocity();
         }
@@ -122,7 +126,7 @@ namespace IngameScript
             program.Log($"Actual set thrust: {thrust_N.Length()}");
         }
 
-        public void SetThrustToZero()
+        void SetThrustToZero()
         {
             SetThrustRaw(Vector3D.Zero);
         }

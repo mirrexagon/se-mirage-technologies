@@ -22,17 +22,12 @@ namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
-        Ship ship;
+        ShipNavigation navigation;
 
         public Program()
         {
-            ship = new Ship(this);
-
-            ship.TargetOrientation = QuaternionD.Identity;
-            ship.OrientationControlEnabled = true;
-
-            ship.TargetPosition = ship.GetPosition();
-
+            Ship ship = new Ship(this);
+            navigation = new ShipNavigation(this, ship);
             Runtime.UpdateFrequency = UpdateFrequency.Update10;
         }
 
@@ -41,42 +36,40 @@ namespace IngameScript
             Echo(message);
         }
 
+        void UpdateFromUser(string argument)
+        {
+            if (argument == "panic")
+            {
+                navigation.Panic();
+            }
+            else
+            {
+                GPSLocation location = GPSLocation.FromString(argument);
+                if (location != null)
+                {
+                    navigation.StartStationKeeping(location.position);
+                }
+            }
+        }
+
         public void Main(string argument, UpdateType updateSource)
         {
-            Log($"Main: {updateSource}");
-
             try
             {
                 if ((updateSource & (UpdateType.Trigger | UpdateType.Terminal)) != 0)
                 {
-                    ship.ReloadBlockReferences();
-
-                    if (argument == "panic")
-                    {
-                        ship.OrientationControlEnabled = false;
-                        ship.PositionControlEnabled = false;
-                        ship.VelocityControlEnabled = false;
-                        ship.SetInertialDampenersEnabled(true);
-                        ship.SetThrustToZero();
-                    }
-                    else
-                    {
-                        GPSLocation location = GPSLocation.FromString(argument);
-                        if (location != null)
-                        {
-                            ship.TargetPosition = location.position;
-                        }
-                        ship.PositionControlEnabled = true;
-                    }
+                    UpdateFromUser(argument);
                 }
-
-                double dt = Runtime.TimeSinceLastRun.TotalSeconds;
-                if (dt == 0)
+                else if ((updateSource & UpdateType.Update10) != 0)
                 {
-                    return;
-                }
+                    double dt = Runtime.TimeSinceLastRun.TotalSeconds;
+                    if (dt == 0)
+                    {
+                        return;
+                    }
 
-                ship.Update(dt);
+                    navigation.Update(dt);
+                }
             }
             catch (Exception e)
             {

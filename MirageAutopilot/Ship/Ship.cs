@@ -47,23 +47,6 @@ namespace IngameScript
             }
         }
 
-        bool _positionControlEnabled = false;
-        public bool PositionControlEnabled
-        {
-            get { return _positionControlEnabled; }
-            set
-            {
-                // Position control requires velocity control.
-                // Enable velocity control if needed, but do not disable.
-                if (value && !VelocityControlEnabled)
-                {
-                    VelocityControlEnabled = true;
-                }
-
-                _positionControlEnabled = value;
-            }
-        }
-
         // Ship controllers
         List<IMyShipController> shipControllers;
         List<IMyRemoteControl> remoteControls;
@@ -84,16 +67,19 @@ namespace IngameScript
             TargetVelocity = Vector3D.Zero;
         }
 
+        public void Panic()
+        {
+            OrientationControlEnabled = false;
+            VelocityControlEnabled = false;
+            SetInertialDampenersEnabled(true);
+            SetThrustToZero();
+        }
+
         public virtual void Update(double dt)
         {
             if (_orientationControlEnabled)
             {
                 UpdateOrientationControl(dt);
-            }
-
-            if (_positionControlEnabled)
-            {
-                UpdateStationKeeping(dt);
             }
 
             if (_velocityControlEnabled)
@@ -120,7 +106,6 @@ namespace IngameScript
 
             ReloadRotationBlockReferences();
             ReloadThrustBlockReferences();
-            ReloadNavigation();
         }
 
         IMyShipController FindOrientationReference()
@@ -162,6 +147,11 @@ namespace IngameScript
 
             cockpits = new List<IMyCockpit>();
             program.GridTerminalSystem.GetBlocksOfType(cockpits);
+        }
+
+        public Vector3D GetPosition()
+        {
+            return orientationReference.CenterOfMass;
         }
 
     }
