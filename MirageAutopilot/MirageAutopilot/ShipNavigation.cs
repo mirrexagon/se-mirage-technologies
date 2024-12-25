@@ -77,6 +77,7 @@ namespace IngameScript
                     break;
 
                 case State.StationKeeping:
+                    program.Log("State: StationKeeping");
                     UpdateStationKeeping(dt);
                     break;
             }
@@ -86,6 +87,7 @@ namespace IngameScript
 
         public void StartStationKeeping(Vector3D position)
         {
+            ship.TargetOrientation = QuaternionD.Identity;
             TargetPosition = position;
             state = State.StationKeeping;
         }

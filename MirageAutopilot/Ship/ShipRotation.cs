@@ -23,7 +23,7 @@ namespace IngameScript
     internal partial class Ship
     {
         // Target world orientation of the orientation reference.
-        QuaternionD TargetOrientation { get; set; }
+        public QuaternionD TargetOrientation { get; set; }
 
         // All gyros on the ship.
         List<IMyGyro> gyros;
