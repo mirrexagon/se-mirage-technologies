@@ -26,6 +26,8 @@ namespace IngameScript
         readonly ManeuverExecutor maneuverExecutor;
         readonly ConnectorHandler connectorHandler;
 
+        string test_connectorIdToMatch;
+
         public Program()
         {
             ship = new Ship(this);
@@ -72,12 +74,29 @@ namespace IngameScript
                         return;
                     }
 
+                    if (test_connectorIdToMatch != null)
+                    {
+                        var targetConnector = connectorHandler.ReceivedConnectorAdvertisements[test_connectorIdToMatch];
+
+                        var primaryConnectorLocalToWorld = QuaternionD.CreateFromRotationMatrix(connectorHandler.PrimaryDockingConnector.WorldMatrix);
+                        var shipLocalToWorld = ship.GetWorldOrientation();
+
+                        var primaryConnectorToShip = QuaternionD.Inverse(primaryConnectorLocalToWorld) * shipLocalToWorld;
+
+                        ship.TargetOrientation = targetConnector.WorldOrientation;
+                    }
+
                     maneuverExecutor.Update(dt);
                 }
                 else if ((updateSource & UpdateType.Update100) != 0)
                 {
                     connectorHandler.AdvertiseConnectors();
                     connectorHandler.ProcessReceivedAdvertisements();
+
+                    if (test_connectorIdToMatch == null && connectorHandler.ReceivedConnectorAdvertisements.Count > 0)
+                    {
+                        test_connectorIdToMatch = connectorHandler.ReceivedConnectorAdvertisements.Keys.First();
+                    }
 
                     Log("Advertised connectors:");
                     DateTime now = DateTime.Now;

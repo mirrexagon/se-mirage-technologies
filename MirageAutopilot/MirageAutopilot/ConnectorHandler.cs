@@ -1,3 +1,5 @@
+using Microsoft.Build.Utilities;
+using Sandbox.Game.Entities.Interfaces;
 using Sandbox.Game.EntityComponents;
 using Sandbox.ModAPI.Ingame;
 using Sandbox.ModAPI.Interfaces;
@@ -85,8 +87,9 @@ namespace IngameScript
         }
 
         public Dictionary<string, ConnectorInfo> ReceivedConnectorAdvertisements { get; private set; }
+        public IMyShipConnector PrimaryDockingConnector { get; private set; }
 
-        Program program;
+        readonly Program program;
         List<IMyShipConnector> connectorsOnShip;
         IMyBroadcastListener connectorAdvertisementListener;
 
@@ -97,11 +100,18 @@ namespace IngameScript
         {
             this.program = program;
 
-            connectorsOnShip = new List<IMyShipConnector>();
-            program.GridTerminalSystem.GetBlocksOfType(connectorsOnShip);
+            ReloadBlockReferences();
 
             ReceivedConnectorAdvertisements = new Dictionary<string, ConnectorInfo>();
             connectorAdvertisementListener = program.IGC.RegisterBroadcastListener(CONNECTOR_ADVERTISE_TAG);
+        }
+
+        public void ReloadBlockReferences()
+        {
+            connectorsOnShip = new List<IMyShipConnector>();
+            program.GridTerminalSystem.GetBlocksOfType(connectorsOnShip);
+
+            PrimaryDockingConnector = connectorsOnShip.Find(c => c.IsParkingEnabled);
         }
 
         public void AdvertiseConnectors()
