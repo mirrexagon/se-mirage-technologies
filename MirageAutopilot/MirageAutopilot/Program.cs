@@ -22,13 +22,17 @@ namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
-        ShipNavigation navigation;
+        readonly Ship ship;
+        readonly ManeuverExecutor maneuverExecutor;
+        readonly ConnectorHandler connectorHandler;
 
         public Program()
         {
-            Ship ship = new Ship(this);
-            navigation = new ShipNavigation(this, ship);
-            Runtime.UpdateFrequency = UpdateFrequency.Update10;
+            ship = new Ship(this);
+            maneuverExecutor = new ManeuverExecutor(this, ship);
+            connectorHandler = new ConnectorHandler(this);
+
+            Runtime.UpdateFrequency = UpdateFrequency.Update10 | UpdateFrequency.Update100;
         }
 
         public void Log(string message)
@@ -40,14 +44,14 @@ namespace IngameScript
         {
             if (argument == "panic")
             {
-                navigation.Panic();
+                maneuverExecutor.StopControl();
             }
             else
             {
                 GPSLocation location = GPSLocation.FromString(argument);
                 if (location != null)
                 {
-                    navigation.StartStationKeeping(location.position);
+                    maneuverExecutor.StartStationKeeping(location.Position, ship.GetWorldOrientation());
                 }
             }
         }
@@ -68,7 +72,20 @@ namespace IngameScript
                         return;
                     }
 
-                    navigation.Update(dt);
+                    maneuverExecutor.Update(dt);
+                }
+                else if ((updateSource & UpdateType.Update100) != 0)
+                {
+                    connectorHandler.AdvertiseConnectors();
+                    connectorHandler.ProcessReceivedAdvertisements();
+
+                    Log("Advertised connectors:");
+                    DateTime now = DateTime.Now;
+                    foreach (var info in connectorHandler.ReceivedConnectorAdvertisements.Values)
+                    {
+                        TimeSpan receivedTimeAgo = now - info.LastAdvertisementReceived;
+                        Log($"{info.Name}: {receivedTimeAgo.TotalSeconds} seconds ago");
+                    }
                 }
             }
             catch (Exception e)

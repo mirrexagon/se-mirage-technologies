@@ -18,14 +18,9 @@ namespace IngameScript
 {
     internal class GPSLocation
     {
-        public string name;
-        public Vector3D position;
-
-        public GPSLocation(string name, Vector3D position)
-        {
-            this.name = name;
-            this.position = position;
-        }
+        public string Name { get; private set; }
+        public Vector3D Position { get; private set; }
+        public Color Color { get; private set; }
 
         public static GPSLocation FromString(string gpsString)
         {
@@ -33,25 +28,65 @@ namespace IngameScript
 
             if (fields[0] != "GPS")
             {
-                return null;
+                throw new FormatException($"'{gpsString}' is not a GPS string");
             }
 
             string name = fields[1];
             double x, y, z;
-            bool xOk = Double.TryParse(fields[2], out x);
-            bool yOk = Double.TryParse(fields[3], out y);
-            bool zOk = Double.TryParse(fields[4], out z);
+            Color color;
+            bool xOk = double.TryParse(fields[2], out x);
+            bool yOk = double.TryParse(fields[3], out y);
+            bool zOk = double.TryParse(fields[4], out z);
+            bool colorOk = TryParseColor(fields[5], out color);
 
-            if (xOk && yOk && zOk)
+            if (xOk && yOk && zOk && colorOk)
             {
                 Vector3D position = new Vector3D(x, y, z);
 
-                return new GPSLocation(name, position);
+                return new GPSLocation
+                {
+                    Name = name,
+                    Position = position,
+                    Color = color,
+                };
             }
             else
             {
-                return null;
+                throw new FormatException($"GPS string '{gpsString}' is formatted incorrectly");
             }
+        }
+        //GPS:Mirrexagon #2:10.65:-159.46:93.75:#FF75C9F1:
+        static bool TryParseColor(string colorString, out Color color)
+        {
+            color = Color.Black;
+
+            if (colorString.Length != 9 || colorString.Substring(0, 1) != "#")
+            {
+                return false;
+            }
+
+            int r, g, b, a;
+            bool rOk = int.TryParse(colorString.Substring(1, 2), System.Globalization.NumberStyles.HexNumber, null, out r);
+            bool gOk = int.TryParse(colorString.Substring(3, 2), System.Globalization.NumberStyles.HexNumber, null, out g);
+            bool bOk = int.TryParse(colorString.Substring(5, 2), System.Globalization.NumberStyles.HexNumber, null, out b);
+            bool aOk = int.TryParse(colorString.Substring(7, 2), System.Globalization.NumberStyles.HexNumber, null, out a);
+
+            if (rOk && gOk && bOk && aOk)
+            {
+                color = new Color(r, g, b, a);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public override string ToString()
+        {
+            string colorString = $"#{Color.R:X02}{Color.G:X02}{Color.B:X02}{Color.A:X02}";
+
+            return $"GPS:{Name}:{Position.X}:{Position.Y}:{Position.Z}:{colorString}:";
         }
     }
 }

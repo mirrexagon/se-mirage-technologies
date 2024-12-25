@@ -38,7 +38,7 @@ namespace IngameScript
             PointInDirection(worldPosition - GetPosition());
         }
 
-        QuaternionD GetWorldOrientation()
+        public QuaternionD GetWorldOrientation()
         {
             return QuaternionD.CreateFromRotationMatrix(orientationReference.WorldMatrix.GetOrientation());
         }

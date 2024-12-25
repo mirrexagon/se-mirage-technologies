@@ -67,7 +67,7 @@ namespace IngameScript
             TargetVelocity = Vector3D.Zero;
         }
 
-        public void Panic()
+        public void StopControl()
         {
             OrientationControlEnabled = false;
             VelocityControlEnabled = false;

@@ -20,7 +20,7 @@ using VRageMath;
 
 namespace IngameScript
 {
-    internal class ShipNavigation
+    internal class ManeuverExecutor
     {
         // Idle
         // user sets destination
@@ -38,7 +38,8 @@ namespace IngameScript
         enum State
         {
             Off,
-            StationKeeping,
+            StationKeeping, // Keep target orientation and position.
+            TurnToFace, // Turn while keeping current position.
         }
 
         State state = State.Off;
@@ -54,19 +55,30 @@ namespace IngameScript
 
         double maximumPossibleStoppingDistance;
 
-        public ShipNavigation(Program program, Ship ship)
+        public ManeuverExecutor(Program program, Ship ship)
         {
             this.program = program;
             this.ship = ship;
 
             ship.ReloadBlockReferences();
-            ReloadNavigation();
+            Reload();
         }
 
-        public void Panic()
+        public void StopControl()
         {
             state = State.Off;
-            ship.Panic();
+            ship.StopControl();
+        }
+
+        public void StartStationKeeping(Vector3D position, QuaternionD orientation)
+        {
+            TargetPosition = position;
+            ship.TargetOrientation = orientation;
+
+            ship.VelocityControlEnabled = true;
+            ship.OrientationControlEnabled = true;
+
+            state = State.StationKeeping;
         }
 
         public void Update(double dt)
@@ -85,18 +97,8 @@ namespace IngameScript
             ship.Update(dt);
         }
 
-        public void StartStationKeeping(Vector3D position)
-        {
-            ship.TargetOrientation = QuaternionD.Identity;
-            TargetPosition = position;
-            state = State.StationKeeping;
-        }
-
         void UpdateStationKeeping(double dt)
         {
-            ship.VelocityControlEnabled = true;
-            ship.OrientationControlEnabled = true;
-
             Vector3D positionError = GetPositionError();
 
             double errorDistance = positionError.Normalize();
@@ -144,7 +146,7 @@ namespace IngameScript
             return (speed * speed) / (2 * a);
         }
 
-        void ReloadNavigation()
+        void Reload()
         {
             maximumPossibleStoppingDistance = CalculateMaximumStoppingDistance(CruiseSpeed) * StoppingDistanceSafetyFactor;
         }
