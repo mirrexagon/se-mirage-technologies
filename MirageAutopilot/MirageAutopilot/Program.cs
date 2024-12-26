@@ -53,7 +53,8 @@ namespace IngameScript
                 GPSLocation location = GPSLocation.FromString(argument);
                 if (location != null)
                 {
-                    maneuverExecutor.StartStationKeeping(location.Position, ship.GetWorldOrientation());
+                    //maneuverExecutor.StartStationKeeping(location.Position, ship.GetWorldMatrix().GetOrientation());
+                    maneuverExecutor.StartStationKeeping(location.Position, MatrixD.Identity);
                 }
             }
         }
@@ -77,13 +78,7 @@ namespace IngameScript
                     if (test_connectorIdToMatch != null)
                     {
                         var targetConnector = connectorHandler.ReceivedConnectorAdvertisements[test_connectorIdToMatch];
-
-                        var primaryConnectorLocalToWorld = QuaternionD.CreateFromRotationMatrix(connectorHandler.PrimaryDockingConnector.WorldMatrix);
-                        var shipLocalToWorld = ship.GetWorldOrientation();
-
-                        var primaryConnectorToShip = QuaternionD.Inverse(primaryConnectorLocalToWorld) * shipLocalToWorld;
-
-                        ship.TargetOrientation = targetConnector.WorldOrientation;
+                        //ship.TargetOrientation = targetConnector.WorldMatrix.GetOrientation();
                     }
 
                     maneuverExecutor.Update(dt);
@@ -96,14 +91,6 @@ namespace IngameScript
                     if (test_connectorIdToMatch == null && connectorHandler.ReceivedConnectorAdvertisements.Count > 0)
                     {
                         test_connectorIdToMatch = connectorHandler.ReceivedConnectorAdvertisements.Keys.First();
-                    }
-
-                    Log("Advertised connectors:");
-                    DateTime now = DateTime.Now;
-                    foreach (var info in connectorHandler.ReceivedConnectorAdvertisements.Values)
-                    {
-                        TimeSpan receivedTimeAgo = now - info.LastAdvertisementReceived;
-                        Log($"{info.Name}: {receivedTimeAgo.TotalSeconds} seconds ago");
                     }
                 }
             }

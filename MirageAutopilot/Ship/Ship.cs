@@ -63,7 +63,7 @@ namespace IngameScript
 
             ReloadBlockReferences();
 
-            TargetOrientation = GetWorldOrientation();
+            TargetOrientation = GetWorldMatrix().GetOrientation();
             TargetVelocity = Vector3D.Zero;
         }
 
@@ -94,6 +94,14 @@ namespace IngameScript
             {
                 shipController.DampenersOverride = enabled;
             }
+        }
+
+        // Get local-to-world matrix centered at center of mass and with orientation of the orientation reference.
+        public MatrixD GetWorldMatrix()
+        {
+            MatrixD gridCenterOfMassWorldMatrix = orientationReference.WorldMatrix.GetOrientation();
+            gridCenterOfMassWorldMatrix.Translation = orientationReference.CenterOfMass;
+            return gridCenterOfMassWorldMatrix;
         }
 
         // ---
@@ -148,11 +156,5 @@ namespace IngameScript
             cockpits = new List<IMyCockpit>();
             program.GridTerminalSystem.GetBlocksOfType(cockpits);
         }
-
-        public Vector3D GetPosition()
-        {
-            return orientationReference.CenterOfMass;
-        }
-
     }
 }

@@ -123,7 +123,7 @@ namespace IngameScript
             SetThrustInDirection(Base6Directions.Direction.Up, upThrust);
             SetThrustInDirection(Base6Directions.Direction.Down, downThrust);
 
-            program.Log($"Actual set thrust: {thrust_N.Length()}");
+            // program.Log($"Actual set thrust: {thrust_N.Length()}");
         }
 
         void SetThrustToZero()
@@ -154,7 +154,7 @@ namespace IngameScript
 
             // ---
 
-            program.Log($"AbsMaxThrust: {absMaxThrust}");
+            // program.Log($"AbsMaxThrust: {absMaxThrust}");
 
             direction *= absMaxThrust.Z;
 
@@ -171,7 +171,7 @@ namespace IngameScript
             // ---
 
             double limitingThrust = direction.Normalize();
-            program.Log($"Max thrust in {direction}\n is {limitingThrust} N");
+            // program.Log($"Max thrust in {direction}\n is {limitingThrust} N");
             return limitingThrust;
         }
 

@@ -70,10 +70,16 @@ namespace IngameScript
             ship.StopControl();
         }
 
-        public void StartStationKeeping(Vector3D position, QuaternionD orientation)
+        public void StartStationKeeping(Vector3D position, MatrixD orientation)
         {
-            TargetPosition = position;
-            ship.TargetOrientation = orientation;
+            orientation.Translation = position;
+            StartStationKeeping(orientation);
+        }
+
+        public void StartStationKeeping(MatrixD worldMatrix)
+        {
+            TargetPosition = worldMatrix.Translation;
+            ship.TargetOrientation = worldMatrix.GetOrientation();
 
             ship.VelocityControlEnabled = true;
             ship.OrientationControlEnabled = true;
@@ -104,9 +110,9 @@ namespace IngameScript
             double errorDistance = positionError.Normalize();
             Vector3D positionErrorDirection = positionError;
 
-            program.Log($"Target position: {TargetPosition}");
-            program.Log($"Distance to target: {errorDistance}");
-            program.Log($"Max stopping distance: {maximumPossibleStoppingDistance}");
+            // program.Log($"Target position: {TargetPosition}");
+            // program.Log($"Distance to target: {errorDistance}");
+            // program.Log($"Max stopping distance: {maximumPossibleStoppingDistance}");
 
             if (errorDistance > 0)
             {
@@ -130,14 +136,14 @@ namespace IngameScript
                 // TODO: Use explicit cruising speed here.
                 ship.TargetVelocity = responseVelocity * CruiseSpeed;
 
-                program.Log($"Target speed: {ship.TargetVelocity.Length()}");
-                program.Log($"Actual speed: {ship.GetVelocity().Length()}");
+                // program.Log($"Target speed: {ship.TargetVelocity.Length()}");
+                // program.Log($"Actual speed: {ship.GetVelocity().Length()}");
             }
         }
 
         Vector3D GetPositionError()
         {
-            return TargetPosition - ship.GetPosition();
+            return TargetPosition - ship.GetWorldMatrix().Translation;
         }
 
         double CalculateMaximumStoppingDistance(double speed)

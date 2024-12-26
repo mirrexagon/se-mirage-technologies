@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
 using VRage;
 using VRage.Collections;
@@ -28,8 +29,7 @@ namespace IngameScript
         internal class ConnectorInfo
         {
             public string Name { get; private set; }
-            public Vector3D WorldPosition { get; private set; }
-            public QuaternionD WorldOrientation { get; private set; }
+            public MatrixD WorldMatrix { get; private set; }
             public DateTime LastAdvertisementReceived { get; set; }
 
             ConnectorInfo() { }
@@ -37,8 +37,7 @@ namespace IngameScript
             public ConnectorInfo(IMyShipConnector connector)
             {
                 Name = $"{connector.CubeGrid.CustomName}/{connector.DisplayNameText}";
-                WorldPosition = connector.GetPosition();
-                WorldOrientation = QuaternionD.CreateFromRotationMatrix(connector.WorldMatrix.GetOrientation());
+                WorldMatrix = connector.WorldMatrix;
                 LastAdvertisementReceived = DateTime.Now;
             }
 
@@ -66,11 +65,13 @@ namespace IngameScript
                     Vector3D position = new Vector3D(x, y, z);
                     QuaternionD orientation = new QuaternionD(qx, qy, qz, qw);
 
+                    MatrixD worldMatrix = MatrixD.CreateFromQuaternion(orientation);
+                    worldMatrix.Translation = position;
+
                     return new ConnectorInfo
                     {
                         Name = name,
-                        WorldPosition = position,
-                        WorldOrientation = orientation,
+                        WorldMatrix = worldMatrix,
                         LastAdvertisementReceived = DateTime.Now,
                     };
                 }
@@ -82,7 +83,9 @@ namespace IngameScript
 
             public override string ToString()
             {
-                return $"ConnectorInfo:{Name}:{WorldPosition.X}:{WorldPosition.Y}:{WorldPosition.Z}:{WorldOrientation.X}:{WorldOrientation.Y}:{WorldOrientation.Z}:{WorldOrientation.W}";
+                var position = WorldMatrix.Translation;
+                var orientation = QuaternionD.CreateFromRotationMatrix(WorldMatrix);
+                return $"ConnectorInfo:{Name}:{position.X}:{position.Y}:{position.Z}:{orientation.X}:{orientation.Y}:{orientation.Z}:{orientation.W}";
             }
         }
 
