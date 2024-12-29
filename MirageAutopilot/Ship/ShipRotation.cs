@@ -51,7 +51,6 @@ namespace IngameScript
         void UpdateOrientationControl(double dt)
         {
             MatrixD orientationError = GetOrientationError();
-            program.Log($"Error matrix: {orientationError}");
 
             Vector3D worldErrorAxis;
             double worldErrorAngle_rad;
@@ -59,7 +58,6 @@ namespace IngameScript
             GetAxisAngleFromRotationMatrix(ref orientationError, out worldErrorAxis, out worldErrorAngle_rad);
 
             Vector3D axisAngleWorldError = worldErrorAxis * worldErrorAngle_rad;
-            program.Log($"Rotation error: {axisAngleWorldError.X} {axisAngleWorldError.Y} {axisAngleWorldError.Z}");
 
             // https://forum.keenswh.com/threads/how-can-i-roll-my-ship-to-align-its-floor-with-the-floor-of-a-station.7382390/#post-1286963408
             foreach (IMyGyro gyro in gyros)
@@ -106,7 +104,6 @@ namespace IngameScript
 
         MatrixD GetOrientationError()
         {
-            //program.Log($"current: {GetWorldMatrix().GetOrientation()}");
             MatrixD shipToWorld = GetWorldMatrix().GetOrientation();
 
             // Note: Vectors are considered row-major when doing
@@ -115,6 +112,8 @@ namespace IngameScript
             // Top of https://forum.keenswh.com/threads/tutorial-how-to-do-vector-transformations-with-world-matricies.7399827/
 
             // TODO: Why does this work and what does it represent?
+            // Convert TargetOrientation from world to ship-local (ie. rotation from ship to target), then invert it.
+            // Why invert?
             return MatrixD.Transpose(TargetOrientation * MatrixD.Transpose(shipToWorld));
         }
 
