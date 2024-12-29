@@ -54,10 +54,7 @@ namespace IngameScript
                 GPSLocation location = GPSLocation.FromString(argument);
                 if (location != null)
                 {
-                    //maneuverExecutor.StartStationKeeping(location.Position, ship.GetWorldMatrix().GetOrientation());
-                    //var target = MatrixD.CreateFromYawPitchRoll(Math.PI / 3, Math.PI / 4, Math.PI / 2);
-                    var target = MatrixD.Identity;
-                    maneuverExecutor.StartStationKeeping(location.Position, target);
+                    maneuverExecutor.StartStationKeeping(location.Position, ship.GetOrientation());
                 }
             }
         }
@@ -81,7 +78,7 @@ namespace IngameScript
                     if (test_connectorIdToMatch != null)
                     {
                         var targetConnector = connectorHandler.ReceivedConnectorAdvertisements[test_connectorIdToMatch];
-                        //ship.TargetOrientation = targetConnector.WorldMatrix.GetOrientation();
+                        ship.TargetOrientation = targetConnector.WorldOrientation;
                     }
 
                     maneuverExecutor.Update(dt);

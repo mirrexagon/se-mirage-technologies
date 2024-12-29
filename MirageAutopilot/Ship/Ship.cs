@@ -63,7 +63,7 @@ namespace IngameScript
 
             ReloadBlockReferences();
 
-            TargetOrientation = GetWorldMatrix().GetOrientation();
+            TargetOrientation = GetOrientation();
             TargetVelocity = Vector3D.Zero;
         }
 

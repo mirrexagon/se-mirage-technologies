@@ -30,8 +30,6 @@ namespace IngameScript
         // All gyros on the ship.
         List<IMyGyro> gyros;
 
-        bool DEBUG_hasSingularity = false;
-
         void SetGyroOverrideEnabled(bool enabled)
         {
             foreach (IMyGyro gyro in gyros)
@@ -44,7 +42,7 @@ namespace IngameScript
         {
             // Based on https://forum.keenswh.com/threads/how-can-i-roll-my-ship-to-align-its-floor-with-the-floor-of-a-station.7382390/#post-1286963408
 
-            QuaternionD currentWorldOrientation = QuaternionD.CreateFromRotationMatrix(GetWorldMatrix().GetOrientation());
+            QuaternionD currentWorldOrientation = GetOrientation();
             QuaternionD orientationError = TargetOrientation / currentWorldOrientation;
 
             Vector3D worldErrorAxis;
@@ -67,6 +65,11 @@ namespace IngameScript
                 gyro.Yaw = (float)-localRotationAxis.Y;
                 gyro.Roll = (float)-localRotationAxis.Z;
             }
+        }
+
+        public QuaternionD GetOrientation()
+        {
+            return QuaternionD.CreateFromRotationMatrix(orientationReference.WorldMatrix.GetOrientation());
         }
 
         void ReloadRotationBlockReferences()

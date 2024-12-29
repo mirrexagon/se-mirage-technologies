@@ -70,16 +70,10 @@ namespace IngameScript
             ship.StopControl();
         }
 
-        public void StartStationKeeping(Vector3D position, MatrixD orientation)
+        public void StartStationKeeping(Vector3D position, QuaternionD orientation)
         {
-            orientation.Translation = position;
-            StartStationKeeping(orientation);
-        }
-
-        public void StartStationKeeping(MatrixD worldMatrix)
-        {
-            TargetPosition = worldMatrix.Translation;
-            ship.TargetOrientation = worldMatrix.GetOrientation();
+            TargetPosition = position;
+            ship.TargetOrientation = orientation;
 
             ship.VelocityControlEnabled = true;
             ship.OrientationControlEnabled = true;

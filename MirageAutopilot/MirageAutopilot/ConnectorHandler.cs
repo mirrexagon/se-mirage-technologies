@@ -29,7 +29,8 @@ namespace IngameScript
         internal class ConnectorInfo
         {
             public string Name { get; private set; }
-            public MatrixD WorldMatrix { get; private set; }
+            public Vector3D WorldPosition { get; private set; }
+            public QuaternionD WorldOrientation { get; private set; }
             public DateTime LastAdvertisementReceived { get; set; }
 
             ConnectorInfo() { }
@@ -37,7 +38,8 @@ namespace IngameScript
             public ConnectorInfo(IMyShipConnector connector)
             {
                 Name = $"{connector.CubeGrid.CustomName}/{connector.DisplayNameText}";
-                WorldMatrix = connector.WorldMatrix;
+                WorldPosition = connector.WorldMatrix.Translation;
+                WorldOrientation = QuaternionD.CreateFromRotationMatrix(connector.WorldMatrix.GetOrientation());
                 LastAdvertisementReceived = DateTime.Now;
             }
 
@@ -65,13 +67,11 @@ namespace IngameScript
                     Vector3D position = new Vector3D(x, y, z);
                     QuaternionD orientation = new QuaternionD(qx, qy, qz, qw);
 
-                    MatrixD worldMatrix = MatrixD.CreateFromQuaternion(orientation);
-                    worldMatrix.Translation = position;
-
                     return new ConnectorInfo
                     {
                         Name = name,
-                        WorldMatrix = worldMatrix,
+                        WorldPosition = position,
+                        WorldOrientation = orientation,
                         LastAdvertisementReceived = DateTime.Now,
                     };
                 }
@@ -83,8 +83,8 @@ namespace IngameScript
 
             public override string ToString()
             {
-                var position = WorldMatrix.Translation;
-                var orientation = QuaternionD.CreateFromRotationMatrix(WorldMatrix);
+                var position = WorldPosition;
+                var orientation = WorldOrientation;
                 return $"ConnectorInfo:{Name}:{position.X}:{position.Y}:{position.Z}:{orientation.X}:{orientation.Y}:{orientation.Z}:{orientation.W}";
             }
         }
