@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using VRage;
 using VRage.Collections;
@@ -54,7 +55,9 @@ namespace IngameScript
                 if (location != null)
                 {
                     //maneuverExecutor.StartStationKeeping(location.Position, ship.GetWorldMatrix().GetOrientation());
-                    maneuverExecutor.StartStationKeeping(location.Position, MatrixD.Identity);
+                    //var target = MatrixD.CreateFromYawPitchRoll(Math.PI / 3, Math.PI / 4, Math.PI / 2);
+                    var target = MatrixD.Identity;
+                    maneuverExecutor.StartStationKeeping(location.Position, target);
                 }
             }
         }
